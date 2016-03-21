@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import sys
 import os
 import argparse
@@ -6,7 +7,7 @@ import random
 import struct
 import time
 
-global VALID_TYPES 
+global VALID_TYPES
 VALID_TYPES = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink', 'circular_symlink', 'link', 'fifo']
 
 def get_random_bytes(count):
@@ -52,12 +53,18 @@ def create_object(name, file_type):
     elif file_type == 'symlink':
         os.symlink(b'.', name)
     elif file_type == 'broken_symlink':
-        # just setting the target to a random byte does not gurantee a broken symlink
-        # in the case of a fixed target like b'a' _at least_ one symlink (in the complete coverage of n bytes case, when n=1 the 'a' symlink will be circular) will be circular and broken.
+        # setting the target to a random byte does not gurantee a broken symlink
+        # in the case of a fixed target like b'a' _at least_ one symlink
+        # (in the complete coverage of n bytes case, when n=1 the 'a' symlink will be circular) 
+        # will be circular and broken.
         # methods:
-        #   set target ../ OUTSIDE (because one inside could name clash) the current folder and choose a path guranteed to not exist.
-        # how to gurantee the target does not exist? assume the "root" folder tree is deleted every run, so clean slate. then assume a custom ../$dest_dir_$timestamp_for_broken_symlinks/name DOES NOT EXIST.
-        # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00, this way every symlink has a unique existing (or soon exising) target. fuck. might be a nice way to gen circular symlinks... must skip '.', '..', '/', '\x00'
+        #   set target ../ OUTSIDE (because one inside could name clash) the current folder and
+        # choose a path guranteed to not exist.
+        # to gurantee the target does not exist, assume the "root" folder tree is deleted every run,
+        # then assume a custom ../$dest_dir_$timestamp_for_broken_symlinks/name DOES NOT EXIST.
+        # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00,
+        # this way every symlink has a unique existing (or soon exising) target.
+        # might be a nice way to gen circular symlinks... must skip '.', '..', '/', '\x00'
 
         non_existing_target = b'../' + str(time.time()).encode('UTF8') + b'/' + name
         os.symlink(non_existing_target, name)
@@ -118,7 +125,6 @@ class DefaultHelpParser(argparse.ArgumentParser):
     def _get_option_tuples(self, option_string):    #https://bugs.python.org/issue14910
         return []
 
-# http://stackoverflow.com/questions/3853722/python-argparse-how-to-insert-newline-in-the-help-text
 class SmartFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         # this is the RawTextHelpFormatter._split_lines
@@ -128,7 +134,8 @@ class SmartFormatter(argparse.HelpFormatter):
 
 def main():
     # 1 byte names
-    # expected file count = 255 - 2 = 253 (. and / note 0 is NULL) # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
+    # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
+    # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
     make_all_one_byte_objects(b'1_byte_file_names', 'file', 253)
     make_all_one_byte_objects(b'1_byte_dir_names', 'dir', 253)
     make_all_one_byte_objects(b'1_byte_symlink_names', 'symlink', 253)
@@ -136,7 +143,8 @@ def main():
     make_all_one_byte_objects(b'1_byte_self_symlink_names', 'self_symlink', 253)
 
     # 2 byte names
-    # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515 # since only NULL and / are invalid, and there is no '..' file
+    # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
+    # since only NULL and / are invalid, and there is no '..' file
     # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
     make_all_two_byte_objects(b'2_byte_file_names', 'file', 64515)
 
@@ -156,26 +164,21 @@ def main():
 
 if __name__ == '__main__':
     parser = DefaultHelpParser(formatter_class=SmartFormatter, add_help=True)
-    no_chroot_help = 'R|Do not attempt to chroot into dest_dir.\n'
     long_tests_help = 'R|Run tests that may take hours to complete and even longer to delete.\n'
     dest_dir_help = 'R|Directory to make files under. Should be empty.\n'
 
     parser.add_argument("dest_dir", help=dest_dir_help, type=str)
-    parser.add_argument("--no-chroot", help=no_chroot_help, action="store_true", default=False)
     parser.add_argument("--long-tests", help=long_tests_help, action="store_true", default=False)
 
     cmd_args = parser.parse_args()
 
-    dest_dir = cmd_args.dest_dir
-    try:
-        os.makedirs(dest_dir)
-    except:
-        print("you must specify a non-existing path to mkdir() and chroot or chdir into. Exitng.")
-        os._exit(1)
+    dest_dir = os.path.abspath(os.path.expanduser(cmd_args.dest_dir))
+#    print("dest_dir:", dest_dir)
 
-    if not cmd_args.no_chroot:
-        os.chroot(dest_dir)
-    else:
-        os.chdir(cmd_args.dest_dir)
+    os.makedirs(dest_dir)
+#    print("chainging to", dest_dir)
+    os.chdir(dest_dir)
 
     main()
+
+
