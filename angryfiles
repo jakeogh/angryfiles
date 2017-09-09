@@ -55,7 +55,7 @@ def create_object(name, file_type):
     elif file_type == 'broken_symlink':
         # setting the target to a random byte does not gurantee a broken symlink
         # in the case of a fixed target like b'a' _at least_ one symlink
-        # (in the complete coverage of n bytes case, when n=1 the 'a' symlink will be circular) 
+        # (in the complete coverage of n bytes case, when n=1 the 'a' symlink will be circular)
         # will be circular and broken.
         # methods:
         #   set target ../ OUTSIDE (because one inside could name clash) the current folder and
@@ -136,22 +136,22 @@ def main():
     # 1 byte names
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
-    make_all_one_byte_objects(b'1_byte_file_names', 'file', 253)
-    make_all_one_byte_objects(b'1_byte_dir_names', 'dir', 253)
-    make_all_one_byte_objects(b'1_byte_symlink_names', 'symlink', 253)
-    make_all_one_byte_objects(b'1_byte_broken_symlink_names', 'broken_symlink', 253)
-    make_all_one_byte_objects(b'1_byte_self_symlink_names', 'self_symlink', 253)
+    make_all_one_byte_objects(b'all_1_byte_file_names', 'file', 253)
+    make_all_one_byte_objects(b'all_1_byte_dir_names', 'dir', 253)
+    make_all_one_byte_objects(b'all_1_byte_symlink_names', 'symlink', 253)
+    make_all_one_byte_objects(b'all_1_byte_broken_symlink_names', 'broken_symlink', 253)
+    make_all_one_byte_objects(b'all_1_byte_self_symlink_names', 'self_symlink', 253)
 
     # 2 byte names
     # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
     # since only NULL and / are invalid, and there is no '..' file
     # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
-    make_all_two_byte_objects(b'2_byte_file_names', 'file', 64515)
+    make_all_two_byte_objects(b'all_2_byte_file_names', 'file', 64515)
 
     if cmd_args.long_tests:
-        make_all_two_byte_objects(b'2_byte_dir_names', 'dir', 64515) # takes forever to delete
-        make_all_two_byte_objects(b'2_byte_symlink_names', 'symlink', 64515)
-        make_all_two_byte_objects(b'2_byte_broken_symlink_names', 'broken_symlink', 64515)
+        make_all_two_byte_objects(b'all_2_byte_dir_names', 'dir', 64515) # takes forever to delete
+        make_all_two_byte_objects(b'all_2_byte_symlink_names', 'symlink', 64515)
+        make_all_two_byte_objects(b'all_2_byte_broken_symlink_names', 'broken_symlink', 64515)
 
     # all length objects
     # expected file count = 255
