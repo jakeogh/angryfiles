@@ -9,7 +9,7 @@ Inspired by https://github.com/petrosagg/wtfiles
 usage: angryfiles [-h] [--long-tests] dest_dir
 
 positional arguments:
-  dest_dir      Directory to make files under. Should be empty.
+  dest_dir      Directory to make files under. Must not exist.
 
 optional arguments:
   -h, --help    show this help message and exit
@@ -38,7 +38,9 @@ drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_self_symlink_names
 drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_symlink_names
 ``` 
 
-**Realted Software**
+**Realted Software:**
+
+https://github.com/petrosagg/wtfiles
 
 https://github.com/omaciel/fauxfactory
 
