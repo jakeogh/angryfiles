@@ -36,11 +36,11 @@ def write_file(name, data=b''):
     with open(name, 'xb') as fh:
         fh.write(data)
 
-def all_valid_filename_bytes(): # everything but NULL and / # interestingly, / is a valid symlink dest
+def all_valid_filename_bytes(): # everything but NULL and / interestingly, / is a valid symlink dest
     return set([bytes(chr(x), encoding='Latin-1') for x in range(0,256)]) - set([b'\x00',b'\x2F'])
 
 def random_filename_length():
-    return random.SystemRandom().randint(0, 256)    #should be 255
+    return random.SystemRandom().randint(0, 256) # should be 255
 
 def create_object(name, file_type):
     if file_type not in VALID_TYPES:
@@ -64,7 +64,7 @@ def create_object(name, file_type):
         # then assume a custom ../$dest_dir_$timestamp_for_broken_symlinks/name DOES NOT EXIST.
         # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00,
         # this way every symlink has a unique existing (or soon exising) target.
-        # might be a nice way to gen circular symlinks... must skip '.', '..', '/', '\x00'
+        # might be a nice way to generate circular symlinks... must skip '.', '..', '/', '\x00'
 
         non_existing_target = b'../' + str(time.time()).encode('UTF8') + b'/' + name
         os.symlink(non_existing_target, name)
@@ -81,7 +81,7 @@ def make_all_one_byte_objects(dest_dir, file_type, count):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     for byte in all_valid_filename_bytes():
-        if byte != b'\x2E': # '.' is not a valid single byte file name #note it is a valid symlink destination
+        if byte != b'\x2E': # '.' is not a valid single byte file name but it is a valid symlink destination
             create_object(byte, file_type)
     os.chdir(b'../')
     check_file_count(dest_dir, count)
@@ -92,7 +92,7 @@ def make_all_two_byte_objects(dest_dir, file_type, count):
     for first_byte in all_valid_filename_bytes():
         for second_byte in all_valid_filename_bytes():
             file_name = first_byte + second_byte
-            if file_name != b'..':  # '..' is not a valid 2 byte file name, but it is a valid symlink destination
+            if file_name != b'..':  # '..' is not a valid 2 byte file name but it is a valid symlink destination
                 create_object(file_name, file_type)
     os.chdir(b'../')
     check_file_count(dest_dir, count)
@@ -122,7 +122,7 @@ class DefaultHelpParser(argparse.ArgumentParser):
         sys.stderr.write('error: %s\n\n' % message)
         self.print_help()
         sys.exit(2)
-    def _get_option_tuples(self, option_string):    #https://bugs.python.org/issue14910
+    def _get_option_tuples(self, option_string): # https://bugs.python.org/issue14910
         return []
 
 class SmartFormatter(argparse.HelpFormatter):
