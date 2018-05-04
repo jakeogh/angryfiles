@@ -34,7 +34,6 @@ drwxr-xr-x 255 user user    4096 Mar 21 03:46 all_1_byte_dir_names
 drwxr-xr-x   2 user user    4096 Mar 21 03:46 all_1_byte_file_names
 drwxr-xr-x   2 user user    4096 Mar 21 03:46 all_1_byte_self_symlink_names
 drwxr-xr-x   2 user user    4096 Mar 21 03:46 all_1_byte_symlink_names
-drwxr-xr-x   2 user user 1064960 Mar 21 03:46 all_2_byte_file_names
 drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_broken_symlink_names
 drwxr-xr-x 257 user user   49152 Mar 21 03:46 all_length_dir_names
 drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_file_names
@@ -44,9 +43,15 @@ drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_symlink_names
 
 **Realted Software:**
 
-https://github.com/petrosagg/wtfiles
+    https://github.com/petrosagg/wtfiles
 
-https://github.com/omaciel/fauxfactory
+    https://github.com/omaciel/fauxfactory
 
-https://github.com/minimaxir/big-list-of-naughty-strings
+    https://github.com/minimaxir/big-list-of-naughty-strings
+
+**More filesystem encoding info:**
+
+    https://news.ycombinator.com/item?id=16991263
+
+    https://www.linux.com/news/cli-magic-convert-file-names-different-encoding-convmv
 
