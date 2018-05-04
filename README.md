@@ -1,7 +1,7 @@
 
 # angryfiles
 
-**angryfiles** attempts to create a filesystem heirachary which is as diverse as possible.
+**angryfiles** attempts to create a filesystem hierarchy which is as diverse as possible.
 
 Inspired by https://github.com/petrosagg/wtfiles
 
@@ -16,7 +16,7 @@ optional arguments:
   --long-tests  Run tests that may take hours to complete and even longer to delete.
 ```
 
-**example:**
+**Example**
 
 ```
 
@@ -42,7 +42,7 @@ drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_self_symlink_names
 drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_symlink_names
 ```
 
-**Realted Software:**
+**Related Software**
 
 https://github.com/petrosagg/wtfiles
 
