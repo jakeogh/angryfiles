@@ -197,13 +197,14 @@ def main():
     make_all_one_byte_objects(b'symlinks/all_1_byte_broken_symlink_names', 'broken_symlink', 253)
     make_all_one_byte_objects(b'symlinks/all_1_byte_self_symlink_names', 'self_symlink', 253)
 
-    # 2 byte names
-    # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
-    # since only NULL and / are invalid, and there is no '..' file
-    # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
-    make_all_two_byte_objects(b'files/all_2_byte_file_names', 'file', 64515)
 
     if cmd_args.long_tests:
+        # 2 byte names
+        # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
+        # since only NULL and / are invalid, and there is no '..' file
+        # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
+        make_all_two_byte_objects(b'files/all_2_byte_file_names', 'file', 64515)
+
         make_all_two_byte_objects(b'dirs/all_2_byte_dir_names', 'dir', 64515)  # takes forever to delete
         make_all_two_byte_objects(b'symlinks/all_2_byte_symlink_names_to_dot', 'symlink', 64515)
         make_all_two_byte_objects(b'symlinks/all_2_byte_symlink_names_to_dotdot', 'symlink', 64515, b'..')
@@ -242,4 +243,8 @@ if __name__ == '__main__':
     pprint.pprint(TOTALS_DICT)
     command = ' '.join(['/usr/bin/find', DEST_DIR, '|', 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
-    assert final_count == 69113
+    #print("final_count:", final_count)
+    if cmd_args.long_tests:
+        assert final_count == 69113
+    else:
+        assert final_count == 4089
