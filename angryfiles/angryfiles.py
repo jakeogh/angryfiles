@@ -52,7 +52,7 @@ def valid_filename_bytes():
         valid bytes to include in a filename
 
         everything but 'NULL' (0) and '/' (47)
-        Note:
+        Notes:
             '/' (47) is a valid symlink dest
             '.' (46) is not a valid single byte filename to create
                 since it always already exists
@@ -63,6 +63,8 @@ def valid_filename_bytes():
     assert len(ans) == 254
     assert b'\x00' not in ans  # NULL
     assert b'\x2F' not in ans  # /
+    for byte in ans:
+        assert isinstance(byte, bytes)
     return ans
 
 def valid_symlink_dest_bytes():  # todo use
