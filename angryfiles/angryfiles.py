@@ -49,9 +49,9 @@ def write_file(name, data=b''):
 
 def valid_filename_bytes():
     '''
-        everything but NULL(0) and /(47)
-        interestingly, /(47) is a valid symlink dest
-        includes .(46) but it is not a valid single byte
+        everything but 'NULL' (0) and '/' (47)
+        interestingly, '/' (47) is a valid symlink dest
+        includes '.' (46) but it is not a valid single byte
         filename to create since it always already exists
     '''
     ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
@@ -67,7 +67,7 @@ def valid_symlink_dest_bytes():  # todo use
 
 def writable_one_byte_filenames():
     '''
-        .(46) is not a valid one byte file name but is a valid symlink destination
+        '.' (46) is not a valid one byte file name but is a valid symlink destination
     '''
     ans = valid_filename_bytes() - {b'.'}
     assert len(ans) == 253  # (256 - [\x00, \x46, \x47])
@@ -75,13 +75,13 @@ def writable_one_byte_filenames():
 
 def writable_two_byte_filenames():
     '''
-        ..(46, 46) is not a valid two byte file name but is a valid symlink destination
+        '..' (46, 46) is not a valid two byte file name but is a valid symlink destination
     '''
     ans = set(itertools.product(valid_filename_bytes(), repeat=2)) - {(b'.', b'.')}
     assert len(ans) == 64515
     return ans
 
-def create_object(name, file_type, target=b'.'):
+def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
     if file_type not in VALID_TYPES:
         print("you must specify one of:", VALID_TYPES)
         os._exit(1)
@@ -92,19 +92,18 @@ def create_object(name, file_type, target=b'.'):
     elif file_type == 'symlink':
         os.symlink(target, name)
     elif file_type == 'broken_symlink':
-        # setting the target to a random byte does not gurantee a broken symlink
+        # setting target to a random byte does not gurantee a broken symlink
         # in the case of a fixed target like b'a' _at least_ one symlink
-        # (in the complete coverage of n bytes case, when n=1 the 'a' symlink will be circular)
         # will be circular and therefore not broken.
-        # methods:
-        #   set target ../ OUTSIDE (because one inside could name clash) the current folder and
-        # choose a path guranteed to not exist.
-        # to gurantee the target does not exist, assume the "root" folder tree is deleted every run,
-        # then assume a custom ../$dest_dir_$timestamp_for_broken_symlinks/name DOES NOT EXIST.
-        # todo, below is wrong, what was I thinking with \x00?
-        # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00,
-        # this way every symlink has a unique existing (or soon exising) target.
-        # might be a nice way to generate circular symlinks... must skip '.', '..', '/', '\x00'
+        #   (in the complete coverage of n bytes case, when n=1 the 'a' symlink
+        #   will be circular if 'a' is the chosen random symlink dest)
+        # method:
+        #   1. set target ../ OUTSIDE (because one inside could name clash)
+        #      the current folder
+        #   2. choose a path guranteed to not exist
+        # to gurantee the target does not exist:
+        #   1. assume the "root" folder tree is deleted every run
+        #   2. assume a custom ../$dest_dir_$timestamp/name DOES NOT EXIST
 
         non_existing_target = b'../' + str(time.time()).encode('UTF8') + b'/' + name
         os.symlink(non_existing_target, name)
@@ -112,6 +111,10 @@ def create_object(name, file_type, target=b'.'):
     elif file_type == 'self_symlink':
         os.symlink(name, name)
 #   elif file_type == 'circular_symlink':
+        # todo, below is wrong, what was I thinking with \x00?
+        # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00,
+        # this way every symlink has a unique existing (or soon exising) target.
+        # might be a nice way to generate circular symlinks... must skip '.', '..', '/', '\x00'
 #       os.symlink(name_back_to_name, name)
     else:
         print("unsupported file_type:", file_type)
