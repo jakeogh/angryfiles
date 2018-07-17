@@ -177,6 +177,7 @@ class DefaultHelpParser(argparse.ArgumentParser):
         sys.stderr.write('error: %s\n\n' % message)
         self.print_help()
         sys.exit(2)
+
     def _get_option_tuples(self, option_string):  # https://bugs.python.org/issue14910
         return []
 
