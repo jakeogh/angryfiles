@@ -49,15 +49,20 @@ def write_file(name, data=b''):
 
 def valid_filename_bytes():
     '''
+        valid bytes to include in a filename
+
         everything but 'NULL' (0) and '/' (47)
-        interestingly, '/' (47) is a valid symlink dest
-        includes '.' (46) but it is not a valid single byte
-        filename to create since it always already exists
+        Note:
+            '/' (47) is a valid symlink dest
+            '.' (46) is not a valid single byte filename to create
+                since it always already exists
     '''
     ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
     # old_method = set([bytes(chr(x), encoding='Latin-1') for x in range(0, 256)]) - set([b'\x00', b'\x2F'])
     # assert ans == old_method
     assert len(ans) == 254
+    assert b'\x00' not in ans  # NULL
+    assert b'\x2F' not in ans  # /
     return ans
 
 def valid_symlink_dest_bytes():  # todo use
@@ -111,6 +116,8 @@ def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
     elif file_type == 'self_symlink':
         os.symlink(name, name)
 #   elif file_type == 'circular_symlink':
+        # for each valid single byte filename, get the next valid byte and symlink to that
+        # if the next valid byte is 256 (\x377(255)), then wrap around to \x001
         # todo, below is wrong, what was I thinking with \x00?
         # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00,
         # this way every symlink has a unique existing (or soon exising) target.
