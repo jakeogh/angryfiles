@@ -63,6 +63,7 @@ def valid_filename_bytes():
     assert len(ans) == 254
     assert b'\x00' not in ans  # NULL
     assert b'\x2F' not in ans  # /
+    assert b'/' not in ans     # /
     for byte in ans:
         assert isinstance(byte, bytes)
     return ans
@@ -70,6 +71,8 @@ def valid_filename_bytes():
 def valid_symlink_dest_bytes():  # todo use
     ans = valid_filename_bytes() | set(b'/')
     assert len(ans) == 255
+    assert b'\x2F' in ans  # /
+    assert b'/' in ans     # /
     return ans
 
 def writable_one_byte_filenames():
@@ -77,7 +80,8 @@ def writable_one_byte_filenames():
         '.' (46) is not a valid one byte file name but is a valid symlink destination
     '''
     ans = valid_filename_bytes() - {b'.'}
-    assert len(ans) == 253  # (256 - [\x00, \x46, \x47])
+    assert len(ans) == 253  # 256 - [\x00, \x46, \x47]
+                            # 256 - [NULL, '.', '/']
     return ans
 
 def writable_two_byte_filenames():
@@ -86,6 +90,8 @@ def writable_two_byte_filenames():
     '''
     ans = set(itertools.product(valid_filename_bytes(), repeat=2)) - {(b'.', b'.')}
     assert len(ans) == 64515
+    assert b'\x46\x46' not in ans   # '..'
+    assert b'..' not in ans         # '..'
     return ans
 
 def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
