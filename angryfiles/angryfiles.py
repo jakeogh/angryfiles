@@ -14,7 +14,8 @@ from collections import defaultdict
 TOTALS_DICT = defaultdict(int)
 
 global VALID_TYPES
-VALID_TYPES = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink', 'circular_symlink', 'link', 'fifo']
+VALID_TYPES = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
+               'next_symlink', 'circular_symlink', 'link', 'fifo']
 
 def random_bytes(count):
     assert isinstance(count, int)
@@ -95,9 +96,7 @@ def writable_two_byte_filenames():
     return ans
 
 def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
-    if file_type not in VALID_TYPES:
-        print("you must specify one of:", VALID_TYPES)
-        os._exit(1)
+    assert file_type in VALID_TYPES
     if file_type == 'file':
         write_file(name)
     elif file_type == 'dir':
@@ -107,7 +106,7 @@ def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
     elif file_type == 'broken_symlink':
         # setting target to a random byte does not gurantee a broken symlink
         # in the case of a fixed target like b'a' _at least_ one symlink
-        # will be circular and therefore not broken.
+        # will be circular and therefore not broken
         #   (in the complete coverage of n bytes case, when n=1 the 'a' symlink
         #   will be circular if 'a' is the chosen random symlink dest)
         # method:
@@ -123,17 +122,17 @@ def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
 
     elif file_type == 'self_symlink':
         os.symlink(name, name)
-#   elif file_type == 'circular_symlink':
-        # for each valid single byte filename, get the next valid byte and symlink to that
-        # if the next valid byte is 256 (\x377(255)), then wrap around to \x001
-        # todo, below is wrong, what was I thinking with \x00?
-        # check the byte (int) value, if it's >0, add 1, if it's = max_value then return \x00,
-        # this way every symlink has a unique existing (or soon exising) target.
-        # might be a nice way to generate circular symlinks... must skip '.', '..', '/', '\x00'
-#       os.symlink(name_back_to_name, name)
-    else:
-        print("unsupported file_type:", file_type)
-        os._exit(1)
+#   elif file_type == 'next_symlink':
+        # symlink to the next valid symlink target
+        # "next" means:
+        #   if the symlink name is a single byte:
+        #       increment the symlink name byte to the next valid symlink target
+        #       if there is no "next" valid symlink target (when symlink name
+        #       b'\x377' (255) is reached), return the "first" valid symlink
+        #       target b'\x001' (001).
+        #
+        # skip '.', '..', '/', '\x00'
+#       os.symlink(next_valid_symlink_target, name)
 
 def make_all_one_byte_objects(dest_dir, file_type, count, target=b'.'):
     os.makedirs(dest_dir)
