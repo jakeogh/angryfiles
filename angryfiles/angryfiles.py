@@ -15,7 +15,7 @@ TOTALS_DICT = defaultdict(int)
 
 global VALID_TYPES
 VALID_TYPES = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
-               'next_symlink', 'circular_symlink', 'link', 'fifo']
+               'next_symlink', 'next_symlinkable_byte', 'circular_symlink', 'link', 'fifo']
 
 def random_bytes(count):
     assert isinstance(count, int)
@@ -30,6 +30,7 @@ def get_random_filename():
     name = random_bytes(length)  # broken
     return name
 
+# TODO evaluate /usr/lib64/python3.4/site-packages/bs4/dammit.py
 def random_utf8():
     gotutf8 = False
     while not gotutf8:
@@ -116,23 +117,39 @@ def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
         # to gurantee the target does not exist:
         #   1. assume the "root" folder tree is deleted every run
         #   2. assume a custom ../$dest_dir_$timestamp/name DOES NOT EXIST
-
         non_existing_target = b'../' + str(time.time()).encode('UTF8') + b'/' + name
+        # assert non_existing_target does not exist
         os.symlink(non_existing_target, name)
-
     elif file_type == 'self_symlink':
         os.symlink(name, name)
-#   elif file_type == 'next_symlink':
-        # symlink to the next valid symlink target
-        # "next" means:
+    elif file_type == 'next_symlinkable_byte':
+        # symlink to the next valid symlink target byte
+        # next means:
         #   if the symlink name is a single byte:
         #       increment the symlink name byte to the next valid symlink target
         #       if there is no "next" valid symlink target (when symlink name
         #       b'\x377' (255) is reached), return the "first" valid symlink
         #       target b'\x001' (001).
         #
-        # skip '.', '..', '/', '\x00'
-#       os.symlink(next_valid_symlink_target, name)
+        # Note: b'.', b'..' and b'/' are valid symlink targets
+        # assert next_symlinkable_byte is not b'\x00'
+        # os.symlink(next_symlinkable_byte, name)
+        pass
+    elif file_type == 'next_symlink':
+        # symlink to the next valid symlink _name_ byte
+        # "next" means:
+        #   if the symlink name is a single byte:
+        #       increment the symlink name byte to the next valid symlink name
+        #       if there is no "next" valid symlink name (when symlink name
+        #       b'\x377' (255) is reached), return the "first" valid symlink
+        #       name b'\x001' (001).
+        #
+        # assert next_symlink is not b'..'
+        # assert next_symlink is not b'.'
+        # assert next_symlink is not b'/'
+        # assert next_symlink is not b'\x00'
+        # os.symlink(next_symlink, name)
+        pass
 
 def make_all_one_byte_objects(dest_dir, file_type, count, target=b'.'):
     os.makedirs(dest_dir)
