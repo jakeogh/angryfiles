@@ -15,7 +15,8 @@ TOTALS_DICT = defaultdict(int)
 
 global VALID_TYPES
 VALID_TYPES = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
-               'next_symlink', 'next_symlinkable_byte', 'circular_symlink', 'link', 'fifo']
+               'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
+               'link', 'fifo']
 
 def random_bytes(count):
     assert isinstance(count, int)
@@ -47,7 +48,8 @@ def write_file(name, data=b''):
     assert isinstance(name, bytes)
     assert isinstance(data, bytes)
     with open(name, 'xb') as fh:
-        fh.write(data)
+        #fh.write(data)
+        fh.write(name)
 
 def valid_filename_bytes():
     '''
@@ -96,10 +98,10 @@ def writable_two_byte_filenames():
     assert b'..' not in ans         # '..'
     return ans
 
-def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
+def create_object(name, file_type, target=b'.', content=b''):  # fixme: dont imply target
     assert file_type in VALID_TYPES
     if file_type == 'file':
-        write_file(name)
+        write_file(name=name, data=content)
     elif file_type == 'dir':
         os.makedirs(name)
     elif file_type == 'symlink':
@@ -151,11 +153,14 @@ def create_object(name, file_type, target=b'.'):  # fixme: dont imply target
         # os.symlink(next_symlink, name)
         pass
 
-def make_all_one_byte_objects(dest_dir, file_type, count, target=b'.'):
+def make_all_one_byte_objects(dest_dir, file_type, count, target=b'.', self_content=False):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     for byte in writable_one_byte_filenames():
-        create_object(name=byte, file_type=file_type, target=target)
+        if self_content:
+            create_object(name=byte, file_type=file_type, target=target, content=byte)
+        else:
+            create_object(name=byte, file_type=file_type, target=target)
     os.chdir(DEST_DIR)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
@@ -182,13 +187,30 @@ def make_all_two_byte_objects(dest_dir, file_type, count):
     os.chdir(DEST_DIR)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
-def make_all_length_objects(dest_dir, file_type, count, target=b'.'):
+def make_all_length_objects(dest_dir, file_type, count, target=b'.', self_content=False, all_bytes=False):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     byte_length = 1
+    all_valid_bytes = list(valid_filename_bytes())
+    assert all_valid_bytes
+    all_valid_bytes.sort(reverse=True)
+    file_name = None
     while byte_length < 256:
-        file_name = b'a' * byte_length
-        create_object(file_name, file_type, target=target)
+        if all_bytes:
+            try:
+                next_byte = all_valid_bytes.pop()
+            except IndexError:
+                next_byte = b'\x01'
+            if file_name is None:
+                file_name = next_byte
+            else:
+                file_name = file_name + next_byte
+        else:
+            file_name = b'a' * byte_length
+        if self_content:
+            create_object(file_name, file_type, target=target, content=file_name)
+        else:
+            create_object(file_name, file_type, target=target)
         byte_length += 1
     os.chdir(DEST_DIR)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
@@ -224,6 +246,7 @@ def main():
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
     make_all_one_byte_objects(b'files/all_1_byte_file_names', 'file', 253)
+    make_all_one_byte_objects(b'files/all_1_byte_file_names_self_content', 'file', 253, self_content=True)
     make_all_one_byte_objects_each_in_byte_number_folder(b'files/all_1_byte_file_names_one_per_folder', 'file', 253)
     make_all_one_byte_objects(b'dirs/all_1_byte_dir_names', 'dir', 253)
     make_all_one_byte_objects(b'symlinks/all_1_byte_symlink_names_to_dot', 'symlink', 253)  # can cause code to fail on recursion +/+/+/+ -> .
@@ -231,7 +254,6 @@ def main():
     make_all_one_byte_objects(b'symlinks/all_1_byte_symlink_names_to_dev_null', 'symlink', 253, b'/dev/null')
     make_all_one_byte_objects(b'symlinks/all_1_byte_broken_symlink_names', 'broken_symlink', 253)
     make_all_one_byte_objects(b'symlinks/all_1_byte_self_symlink_names', 'self_symlink', 253)
-
 
     if cmd_args.long_tests:
         # 2 byte names
@@ -249,6 +271,8 @@ def main():
     # all length objects
     # expected file count = 255
     make_all_length_objects(b'files/all_length_file_names', 'file', 255)
+    make_all_length_objects(b'files/all_length_file_names_self_content', 'file', 255, self_content=True)
+    make_all_length_objects(b'files/all_length_file_names_all_bytes__self_content', 'file', 255, self_content=True, all_bytes=True)
     make_all_length_objects(b'symlinks/all_length_symlink_names_to_dot', 'symlink', 255)
     make_all_length_objects(b'symlinks/all_length_symlink_names_to_dotdot', 'symlink', 255, b'..')
     make_all_length_objects(b'symlinks/all_length_symlink_names_to_dev_null', 'symlink', 255, b'/dev/null')
@@ -278,8 +302,12 @@ if __name__ == '__main__':
     pprint.pprint(TOTALS_DICT)
     command = ' '.join(['/usr/bin/find', DEST_DIR, '|', 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
-    #print("final_count:", final_count)
+    print("final_count:", final_count)
     if cmd_args.long_tests:
-        assert final_count == 69113
+        expected_final_count = 69113 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
+        print("expected_final_count:", expected_final_count)
+        assert final_count == expected_final_count
     else:
-        assert final_count == 4089
+        expected_final_count = 4089 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
+        print("expected_final_count:", expected_final_count)
+        assert final_count == expected_final_count
