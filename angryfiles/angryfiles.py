@@ -63,7 +63,9 @@ def valid_filename_bytes():
     '''
     ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
     # old_method = set([bytes(chr(x), encoding='Latin-1') for x in range(0, 256)]) - set([b'\x00', b'\x2F'])
+    another_method = set([bytes([x]) for x in range(0, 256) if x not in (0, 0x2f)])      # python@altendky
     # assert ans == old_method
+    assert ans == another_method
     assert len(ans) == 254
     assert b'\x00' not in ans  # NULL
     assert b'\x2F' not in ans  # /
