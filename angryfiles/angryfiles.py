@@ -57,8 +57,8 @@ def valid_filename_bytes():
 
         everything but 'NULL' (0) and '/' (47)
         Notes:
-            '/' (47) is a valid symlink dest
-            '.' (46) is not a valid single byte filename to create
+            '/' (47) is a valid symlink dest                        bytes([47]) == b'/' == b'\x2F'
+            '.' (46) is not a valid single byte filename to create  bytes([46]) == b'.' == b'\x2E'
                 since it always already exists
     '''
     ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
@@ -178,14 +178,14 @@ def make_all_one_byte_objects_each_in_byte_number_folder(dest_dir, file_type, co
     os.chdir(DEST_DIR)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
-def make_all_two_byte_objects(dest_dir, file_type, count):
+def make_all_two_byte_objects(dest_dir, file_type, count, target=b'.'):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     for first_byte in valid_filename_bytes():
         for second_byte in valid_filename_bytes():
             file_name = first_byte + second_byte
             if file_name != b'..':  # '..' is not a valid 2 byte file name but is a valid symlink destination
-                create_object(file_name, file_type)
+                create_object(file_name, file_type, target=target)
     os.chdir(DEST_DIR)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
