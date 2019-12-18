@@ -27,7 +27,7 @@ def get_random_filename():
     name = random_bytes(length)  # broken
     return name
 
-# TODO evaluate /usr/lib64/python3.4/site-packages/bs4/dammit.py
+#  TODO evaluate /usr/lib64/python3.4/site-packages/bs4/dammit.py
 def random_utf8():
     gotutf8 = False
     while not gotutf8:
