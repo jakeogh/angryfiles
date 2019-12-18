@@ -13,10 +13,6 @@ from collections import defaultdict
 
 TOTALS_DICT = defaultdict(int)
 
-global VALID_TYPES
-VALID_TYPES = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
-               'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
-               'link', 'fifo']
 
 def random_bytes(count):
     assert isinstance(count, int)
@@ -101,7 +97,11 @@ def writable_two_byte_filenames():
     return ans
 
 def create_object(name, file_type, target=b'.', content=b''):  # fixme: dont imply target
-    assert file_type in VALID_TYPES
+    valid_types = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
+                   'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
+                   'link', 'fifo']
+
+    assert file_type in valid_types
     if file_type == 'file':
         write_file(name=name, data=content)
     elif file_type == 'dir':
