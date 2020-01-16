@@ -289,7 +289,7 @@ def cli(path, long_tests):
                                   TOTALS_DICT['self_symlink'] + \
                                   TOTALS_DICT['circular_symlink']
     pprint.pprint(TOTALS_DICT)
-    command = ' '.join(['/usr/bin/find', angry_dir.as_posix(), '|', 'wc -l'])
+    command = ' '.join(['/usr/bin/find', angry_dir.as_posix(), "-printf '\n' |", 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
     print("final_count:", final_count)
     if long_tests:
