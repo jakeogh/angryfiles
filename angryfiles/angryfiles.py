@@ -16,6 +16,9 @@ from collections import defaultdict
 global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
 
+def make_working_dir(path):
+    os.makedirs(path)
+    TOTALS_DICT['working_dir'] += 1
 
 def random_bytes(count):
     assert isinstance(count, int)
@@ -159,7 +162,7 @@ def create_object(name, file_type, target=b'.', content=b''):  # fixme: dont imp
         pass
 
 def make_all_one_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.', self_content=False):
-    os.makedirs(dest_dir)
+    make_working_dir(dest_dir)
     os.chdir(dest_dir)
     for byte in writable_one_byte_filenames():
         if self_content:
@@ -170,11 +173,11 @@ def make_all_one_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.'
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
 def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir, dest_dir, file_type, count):
-    os.makedirs(dest_dir)
+    make_working_dir(dest_dir)
     os.chdir(dest_dir)
     for byte in writable_one_byte_filenames():
         byte_folder = str(ord(byte)).zfill(3)
-        os.makedirs(byte_folder)
+        make_working_dir(byte_folder)
         os.chdir(byte_folder)
         create_object(byte, file_type)
         os.chdir(b'../')
@@ -182,7 +185,7 @@ def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir, dest_dir, fi
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
 def make_all_two_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.'):
-    os.makedirs(dest_dir)
+    make_working_dir(dest_dir)
     os.chdir(dest_dir)
     for first_byte in valid_filename_bytes():
         for second_byte in valid_filename_bytes():
@@ -193,7 +196,7 @@ def make_all_two_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.'
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
 def make_all_length_objects(angry_dir, dest_dir, file_type, count, target=b'.', self_content=False, all_bytes=False):
-    os.makedirs(dest_dir)
+    make_working_dir(dest_dir)
     os.chdir(dest_dir)
     byte_length = 1
     all_valid_bytes = list(valid_filename_bytes())
@@ -298,7 +301,10 @@ def cli(path, long_tests):
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
     else:
-        expected_final_count = TOTALS_DICT['all_symlinks'] + TOTALS_DICT['file'] + TOTALS_DICT['dir']
+        expected_final_count = TOTALS_DICT['all_symlinks'] + \
+                               TOTALS_DICT['file'] + \
+                               TOTALS_DICT['dir'] + \
+                               TOTALS_DICT['working_dir']
         #expected_final_count = 4089 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
