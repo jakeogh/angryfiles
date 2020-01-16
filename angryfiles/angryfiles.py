@@ -328,11 +328,11 @@ def cli(path, long_tests, one_angry_file, template_file):
     print("final_count:", final_count)
 
     if one_angry_file:
-        top_level = 2
+        top_level = 1   # angry_dir
     else:
-        top_level = 4  # top level dirs: angry_dir/dirs
-                       #                          /files
-                       #                          /symlinks
+        top_level = 4   # top level dirs: angry_dir/dirs
+                        #                          /files
+                        #                          /symlinks
 
 
     expected_final_count = TOTALS_DICT['all_symlinks'] + \
