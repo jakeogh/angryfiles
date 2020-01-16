@@ -326,12 +326,19 @@ def cli(path, long_tests, one_angry_file, template_file):
     command = ' '.join(['/usr/bin/find', angry_dir.as_posix(), "-printf '\n' |", 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
     print("final_count:", final_count)
+
+    if one_angry_file:
+        top_level = 2
+    else:
+        top_level = 4  # top level dirs: angry_dir/dirs
+                       #                          /files
+                       #                          /symlinks
+
+
     expected_final_count = TOTALS_DICT['all_symlinks'] + \
                            TOTALS_DICT['file'] + \
                            TOTALS_DICT['dir'] + \
-                           TOTALS_DICT['working_dir'] + 4  # top level dirs: angry_dir/dirs
-                                                           #                          /files
-                                                           #                          /symlinks
+                           TOTALS_DICT['working_dir'] + top_level
     if long_tests:
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
