@@ -212,6 +212,7 @@ def make_one_all_byte_file(angry_dir, dest_dir, template_file=None):
         file_name += next_byte
     print(repr(file_name))
     create_object(file_name, file_type='file', template_file=template_file)
+    os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=1, file_type='file')
 
 def make_all_length_objects(angry_dir, dest_dir, file_type, count, target=b'.', self_content=False, all_bytes=False):
