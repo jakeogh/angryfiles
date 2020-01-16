@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
 import sys
+import click
 import os
 import pprint
-import argparse
+#import argparse
 import random
 import struct
 import time
 import itertools
 import subprocess
+from pathlib import Path
 from collections import defaultdict
 
 TOTALS_DICT = defaultdict(int)
@@ -155,7 +157,7 @@ def create_object(name, file_type, target=b'.', content=b''):  # fixme: dont imp
         # os.symlink(next_symlink, name)
         pass
 
-def make_all_one_byte_objects(dest_dir, file_type, count, target=b'.', self_content=False):
+def make_all_one_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.', self_content=False):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     for byte in writable_one_byte_filenames():
@@ -163,10 +165,10 @@ def make_all_one_byte_objects(dest_dir, file_type, count, target=b'.', self_cont
             create_object(name=byte, file_type=file_type, target=target, content=byte)
         else:
             create_object(name=byte, file_type=file_type, target=target)
-    os.chdir(DEST_DIR)
+    os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
-def make_all_one_byte_objects_each_in_byte_number_folder(dest_dir, file_type, count):
+def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir, dest_dir, file_type, count):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     for byte in writable_one_byte_filenames():
@@ -175,10 +177,10 @@ def make_all_one_byte_objects_each_in_byte_number_folder(dest_dir, file_type, co
         os.chdir(byte_folder)
         create_object(byte, file_type)
         os.chdir(b'../')
-    os.chdir(DEST_DIR)
+    os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
-def make_all_two_byte_objects(dest_dir, file_type, count, target=b'.'):
+def make_all_two_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.'):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     for first_byte in valid_filename_bytes():
@@ -186,10 +188,10 @@ def make_all_two_byte_objects(dest_dir, file_type, count, target=b'.'):
             file_name = first_byte + second_byte
             if file_name != b'..':  # '..' is not a valid 2 byte file name but is a valid symlink destination
                 create_object(file_name, file_type, target=target)
-    os.chdir(DEST_DIR)
+    os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
-def make_all_length_objects(dest_dir, file_type, count, target=b'.', self_content=False, all_bytes=False):
+def make_all_length_objects(angry_dir, dest_dir, file_type, count, target=b'.', self_content=False, all_bytes=False):
     os.makedirs(dest_dir)
     os.chdir(dest_dir)
     byte_length = 1
@@ -214,7 +216,7 @@ def make_all_length_objects(dest_dir, file_type, count, target=b'.', self_conten
         else:
             create_object(file_name, file_type, target=target)
         byte_length += 1
-    os.chdir(DEST_DIR)
+    os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
 def check_file_count(dest_dir, count, file_type):
@@ -227,85 +229,84 @@ def check_file_count(dest_dir, count, file_type):
         os._exit(1)
     TOTALS_DICT[file_type] += manual_count
 
-class DefaultHelpParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('error: %s\n\n' % message)
-        self.print_help()
-        sys.exit(2)
+#class DefaultHelpParser(argparse.ArgumentParser):
+#    def error(self, message):
+#        sys.stderr.write('error: %s\n\n' % message)
+#        self.print_help()
+#        sys.exit(2)
+#
+#    def _get_option_tuples(self, option_string):  # https://bugs.python.org/issue14910
+#        return []
+#
+#class SmartFormatter(argparse.HelpFormatter):
+#    def _split_lines(self, text, width):
+#        # this is the RawTextHelpFormatter._split_lines
+#        if text.startswith('R|'):
+#            return text[2:].splitlines()
+#        return argparse.HelpFormatter._split_lines(self, text, width)
 
-    def _get_option_tuples(self, option_string):  # https://bugs.python.org/issue14910
-        return []
-
-class SmartFormatter(argparse.HelpFormatter):
-    def _split_lines(self, text, width):
-        # this is the RawTextHelpFormatter._split_lines
-        if text.startswith('R|'):
-            return text[2:].splitlines()
-        return argparse.HelpFormatter._split_lines(self, text, width)
-
-def main():
+def main(angry_dir, long_tests):
     # 1 byte names
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
-    make_all_one_byte_objects(b'files/all_1_byte_file_names', 'file', 253)
-    make_all_one_byte_objects(b'files/all_1_byte_file_names_self_content', 'file', 253, self_content=True)
-    make_all_one_byte_objects_each_in_byte_number_folder(b'files/all_1_byte_file_names_one_per_folder', 'file', 253)
-    make_all_one_byte_objects(b'dirs/all_1_byte_dir_names', 'dir', 253)
-    make_all_one_byte_objects(b'symlinks/all_1_byte_symlink_names_to_dot', 'symlink', 253)  # can cause code to fail on recursion +/+/+/+ -> .
-    make_all_one_byte_objects(b'symlinks/all_1_byte_symlink_names_to_dotdot', 'symlink', 253, b'..')
-    make_all_one_byte_objects(b'symlinks/all_1_byte_symlink_names_to_dev_null', 'symlink', 253, b'/dev/null')
-    make_all_one_byte_objects(b'symlinks/all_1_byte_broken_symlink_names', 'broken_symlink', 253)
-    make_all_one_byte_objects(b'symlinks/all_1_byte_self_symlink_names', 'self_symlink', 253)
+    make_all_one_byte_objects(angry_dir, b'files/all_1_byte_file_names', 'file', 253)
+    make_all_one_byte_objects(angry_dir, b'files/all_1_byte_file_names_self_content', 'file', 253, self_content=True)
+    make_all_one_byte_objects_each_in_byte_number_folder(angry_dir, b'files/all_1_byte_file_names_one_per_folder', 'file', 253)
+    make_all_one_byte_objects(angry_dir, b'dirs/all_1_byte_dir_names', 'dir', 253)
+    make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_symlink_names_to_dot', 'symlink', 253)  # can cause code to fail on recursion +/+/+/+ -> .
+    make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_symlink_names_to_dotdot', 'symlink', 253, b'..')
+    make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_symlink_names_to_dev_null', 'symlink', 253, b'/dev/null')
+    make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_broken_symlink_names', 'broken_symlink', 253)
+    make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_self_symlink_names', 'self_symlink', 253)
 
-    if cmd_args.long_tests:
+    if long_tests:
         # 2 byte names
         # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
         # since only NULL and / are invalid, and there is no '..' file
         # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
-        make_all_two_byte_objects(b'files/all_2_byte_file_names', 'file', 64515)
+        make_all_two_byte_objects(angry_dir, b'files/all_2_byte_file_names', 'file', 64515)
 
-        make_all_two_byte_objects(b'dirs/all_2_byte_dir_names', 'dir', 64515)  # takes forever to delete
-        make_all_two_byte_objects(b'symlinks/all_2_byte_symlink_names_to_dot', 'symlink', 64515)
-        make_all_two_byte_objects(b'symlinks/all_2_byte_symlink_names_to_dotdot', 'symlink', 64515, b'..')
-        make_all_two_byte_objects(b'symlinks/all_2_byte_symlink_names_to_dev_null', 'symlink', 64515, b'/dev/null')
-        make_all_two_byte_objects(b'symlinks/all_2_byte_broken_symlink_names', 'broken_symlink', 64515)
+        make_all_two_byte_objects(angry_dir, b'dirs/all_2_byte_dir_names', 'dir', 64515)  # takes forever to delete
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dot', 'symlink', 64515)
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dotdot', 'symlink', 64515, b'..')
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dev_null', 'symlink', 64515, b'/dev/null')
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_broken_symlink_names', 'broken_symlink', 64515)
 
     # all length objects
     # expected file count = 255
-    make_all_length_objects(b'files/all_length_file_names', 'file', 255)
-    make_all_length_objects(b'files/all_length_file_names_self_content', 'file', 255, self_content=True)
-    make_all_length_objects(b'files/all_length_file_names_all_bytes__self_content', 'file', 255, self_content=True, all_bytes=True)
-    make_all_length_objects(b'symlinks/all_length_symlink_names_to_dot', 'symlink', 255)
-    make_all_length_objects(b'symlinks/all_length_symlink_names_to_dotdot', 'symlink', 255, b'..')
-    make_all_length_objects(b'symlinks/all_length_symlink_names_to_dev_null', 'symlink', 255, b'/dev/null')
-    make_all_length_objects(b'symlinks/all_length_broken_symlink_names', 'broken_symlink', 255)
-    make_all_length_objects(b'symlinks/all_length_self_symlink_names', 'self_symlink', 255)
-    make_all_length_objects(b'dirs/all_length_dir_names', 'dir', 255)
+    make_all_length_objects(angry_dir, b'files/all_length_file_names', 'file', 255)
+    make_all_length_objects(angry_dir, b'files/all_length_file_names_self_content', 'file', 255, self_content=True)
+    make_all_length_objects(angry_dir, b'files/all_length_file_names_all_bytes__self_content', 'file', 255, self_content=True, all_bytes=True)
+    make_all_length_objects(angry_dir, b'symlinks/all_length_symlink_names_to_dot', 'symlink', 255)
+    make_all_length_objects(angry_dir, b'symlinks/all_length_symlink_names_to_dotdot', 'symlink', 255, b'..')
+    make_all_length_objects(angry_dir, b'symlinks/all_length_symlink_names_to_dev_null', 'symlink', 255, b'/dev/null')
+    make_all_length_objects(angry_dir, b'symlinks/all_length_broken_symlink_names', 'broken_symlink', 255)
+    make_all_length_objects(angry_dir, b'symlinks/all_length_self_symlink_names', 'self_symlink', 255)
+    make_all_length_objects(angry_dir, b'dirs/all_length_dir_names', 'dir', 255)
 
     # max length objects
 
+@click.command()
+@click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1)
+@click.option('--long-tests', is_flag=True)
+def cli(path, long_tests):
+    angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
+    if angry_dir.exists():
+        raise ValueError("path: {} already exists".format(angry_dir))
 
-if __name__ == '__main__':
-    parser = DefaultHelpParser(formatter_class=SmartFormatter, add_help=True)
-    long_tests_help = 'R|Run tests that may take hours to complete and even longer to delete.\n'
-    dest_dir_help = 'R|Directory to make files under. Should be empty.\n'
-    parser.add_argument("dest_dir", help=dest_dir_help, type=str)
-    parser.add_argument("--long-tests", help=long_tests_help, action="store_true", default=False)
-    cmd_args = parser.parse_args()
-    DEST_DIR = os.path.abspath(os.path.expanduser(cmd_args.dest_dir))
-    os.makedirs(DEST_DIR)
-    os.chdir(DEST_DIR)
-    main()
+    angry_dir.mkdir()
+    os.chdir(angry_dir)
+    main(angry_dir=angry_dir, long_tests=long_tests)
 
     TOTALS_DICT['all_symlinks'] = TOTALS_DICT['symlink'] + \
                                   TOTALS_DICT['broken_symlink'] + \
                                   TOTALS_DICT['self_symlink'] + \
                                   TOTALS_DICT['circular_symlink']
     pprint.pprint(TOTALS_DICT)
-    command = ' '.join(['/usr/bin/find', DEST_DIR, '|', 'wc -l'])
+    command = ' '.join(['/usr/bin/find', angry_dir.as_posix(), '|', 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
     print("final_count:", final_count)
-    if cmd_args.long_tests:
+    if long_tests:
         expected_final_count = 69113 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
@@ -313,3 +314,17 @@ if __name__ == '__main__':
         expected_final_count = 4089 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
+
+if __name__ == '__main__':
+    cli()
+    #parser = DefaultHelpParser(formatter_class=SmartFormatter, add_help=True)
+    #long_tests_help = 'R|Run tests that may take hours to complete and even longer to delete.\n'
+    #dest_dir_help = 'R|Directory to make files under. Should be empty.\n'
+    #parser.add_argument("dest_dir", help=dest_dir_help, type=str)
+    #parser.add_argument("--long-tests", help=long_tests_help, action="store_true", default=False)
+    #cmd_args = parser.parse_args()
+    #DEST_DIR = os.path.abspath(os.path.expanduser(cmd_args.dest_dir))
+    #os.makedirs(DEST_DIR)
+    #os.chdir(DEST_DIR)
+    #main()
+

@@ -49,6 +49,8 @@ drwxr-xr-x   2 user user   49152 Mar 21 03:46 all_length_symlink_names
 
     https://github.com/minimaxir/big-list-of-naughty-strings
 
+    https://github.com/NieDzejkob/cursedfs
+
 **More filesystem encoding info:**
 
     https://news.ycombinator.com/item?id=16991263

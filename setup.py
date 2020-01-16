@@ -12,12 +12,12 @@ dependencies = ['click']
 version = 0.01
 
 setup(
-    name = "angryfiles",
-    version = version,
-    url = "https://github.com/jakeogh/angryfiles",
+    name="angryfiles",
+    version=version,
+    url="https://github.com/jakeogh/angryfiles",
     license='PUBLIC DOMAIN',
-    author = "jakeogh",
-    author_email = "github.com@v6y.net",
+    author="jakeogh",
+    author_email="github.com@v6y.net",
     description='common functions',
     long_description=__doc__,
     packages=find_packages(exclude=['tests']),
@@ -27,7 +27,7 @@ setup(
     install_requires=dependencies,
     entry_points={
         'console_scripts': [
-            'angryfiles = angryfiles.angryfiles:angryfiles',
+            'angryfiles = angryfiles.angryfiles:cli',
         ],
     },
     classifiers=[
