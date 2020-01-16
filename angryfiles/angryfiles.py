@@ -4,6 +4,7 @@ import sys
 import click
 import os
 import pprint
+from shutil import copy
 #import argparse
 import random
 import struct
@@ -46,12 +47,16 @@ def random_utf8():
             pass
     return possible_utf8_bytes
 
-def write_file(name, data=b''):
+def write_file(name, data=b'', template_file=None):
     assert isinstance(name, bytes)
     assert isinstance(data, bytes)
-    with open(name, 'xb') as fh:
-        #fh.write(data)
-        fh.write(name)
+    if template_file:
+        assert data == b''
+        name = Path(os.fsdecode(name))
+        copy(template_file, name, follow_symlinks=False)
+    else:
+        with open(name, 'xb') as fh:
+            fh.write(name)
 
 def valid_filename_bytes():
     '''
@@ -102,14 +107,18 @@ def writable_two_byte_filenames():
     assert b'..' not in ans         # '..'
     return ans
 
-def create_object(name, file_type, target=b'.', content=b''):  # fixme: dont imply target
+def create_object(name, file_type, target=b'.', content=b'', template_file=None):  # fixme: dont imply target
     valid_types = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
                    'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
                    'link', 'fifo']
 
     assert file_type in valid_types
+    if template_file:
+        assert file_type == 'file'
+        assert not content
+
     if file_type == 'file':
-        write_file(name=name, data=content)
+        write_file(name=name, data=content, template_file=template_file)
     elif file_type == 'dir':
         os.makedirs(name)
     elif file_type == 'symlink':
@@ -195,6 +204,16 @@ def make_all_two_byte_objects(angry_dir, dest_dir, file_type, count, target=b'.'
     os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
+def make_one_all_byte_file(angry_dir, dest_dir, template_file=None):
+    make_working_dir(dest_dir)
+    os.chdir(dest_dir)
+    file_name = b''
+    for next_byte in valid_filename_bytes():
+        file_name += next_byte
+    print(repr(file_name))
+    create_object(file_name, file_type='file', template_file=template_file)
+    check_file_count(dest_dir=dest_dir, count=1, file_type='file')
+
 def make_all_length_objects(angry_dir, dest_dir, file_type, count, target=b'.', self_content=False, all_bytes=False):
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -248,7 +267,6 @@ def main(angry_dir, long_tests):
     make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_broken_symlink_names', 'broken_symlink', 253)
     make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_self_symlink_names', 'self_symlink', 253)
 
-
     # all length objects
     # expected file count = 255
     make_all_length_objects(angry_dir, b'files/all_length_file_names', 'file', 255)
@@ -260,8 +278,6 @@ def main(angry_dir, long_tests):
     make_all_length_objects(angry_dir, b'symlinks/all_length_broken_symlink_names', 'broken_symlink', 255)
     make_all_length_objects(angry_dir, b'symlinks/all_length_self_symlink_names', 'self_symlink', 255)
     make_all_length_objects(angry_dir, b'dirs/all_length_dir_names', 'dir', 255)
-
-    # max length objects
 
     if long_tests:
         # 2 byte names
@@ -276,17 +292,30 @@ def main(angry_dir, long_tests):
         make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dev_null', 'symlink', 64515, b'/dev/null')
         make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_broken_symlink_names', 'broken_symlink', 64515)
 
+    # TODO max length objects
+
+def one_mad_file(angry_dir, template_file):
+    make_one_all_byte_file(angry_dir=angry_dir,
+                           dest_dir=b'one_mad_file',
+                           template_file=template_file)
+
 @click.command()
 @click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1)
 @click.option('--long-tests', is_flag=True)
-def cli(path, long_tests):
+@click.option('--one-angry-file', is_flag=True)
+@click.option('--template-file', type=click.Path(exists=True, dir_okay=False, file_okay=True, path_type=str, allow_dash=True))
+def cli(path, long_tests, one_angry_file, template_file):
     angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
     if angry_dir.exists():
         raise ValueError("path: {} already exists".format(angry_dir))
 
     angry_dir.mkdir()
     os.chdir(angry_dir)
-    main(angry_dir=angry_dir, long_tests=long_tests)
+    if one_angry_file:
+        one_mad_file(angry_dir=angry_dir, template_file=template_file)
+    else:
+        assert not template_file
+        main(angry_dir=angry_dir, long_tests=long_tests)
 
     TOTALS_DICT['all_symlinks'] = TOTALS_DICT['symlink'] + \
                                   TOTALS_DICT['broken_symlink'] + \
