@@ -13,6 +13,7 @@ import subprocess
 from pathlib import Path
 from collections import defaultdict
 
+global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
 
 
@@ -297,7 +298,8 @@ def cli(path, long_tests):
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
     else:
-        expected_final_count = 4089 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
+        expected_final_count = TOTALS_DICT['all_symlinks'] + TOTALS_DICT['file'] + TOTALS_DICT['dir']
+        #expected_final_count = 4089 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
 
