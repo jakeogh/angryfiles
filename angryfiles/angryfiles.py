@@ -299,7 +299,9 @@ def cli(path, long_tests):
     expected_final_count = TOTALS_DICT['all_symlinks'] + \
                            TOTALS_DICT['file'] + \
                            TOTALS_DICT['dir'] + \
-                           TOTALS_DICT['working_dir'] + 3  # top level dirs: dirs, files, symlinks
+                           TOTALS_DICT['working_dir'] + 4  # top level dirs: angry_dir/dirs
+                                                           #                          /files
+                                                           #                          /symlinks
     if long_tests:
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
