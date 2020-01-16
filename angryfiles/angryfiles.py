@@ -210,7 +210,7 @@ def make_one_all_byte_file(angry_dir, dest_dir, template_file=None):
     file_name = b''
     for next_byte in valid_filename_bytes():
         file_name += next_byte
-    print(repr(file_name))
+    #print(repr(file_name))
     create_object(file_name, file_type='file', template_file=template_file)
     os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=1, file_type='file')
