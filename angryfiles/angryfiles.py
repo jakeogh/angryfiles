@@ -229,21 +229,6 @@ def check_file_count(dest_dir, count, file_type):
         os._exit(1)
     TOTALS_DICT[file_type] += manual_count
 
-#class DefaultHelpParser(argparse.ArgumentParser):
-#    def error(self, message):
-#        sys.stderr.write('error: %s\n\n' % message)
-#        self.print_help()
-#        sys.exit(2)
-#
-#    def _get_option_tuples(self, option_string):  # https://bugs.python.org/issue14910
-#        return []
-#
-#class SmartFormatter(argparse.HelpFormatter):
-#    def _split_lines(self, text, width):
-#        # this is the RawTextHelpFormatter._split_lines
-#        if text.startswith('R|'):
-#            return text[2:].splitlines()
-#        return argparse.HelpFormatter._split_lines(self, text, width)
 
 def main(angry_dir, long_tests):
     # 1 byte names
@@ -259,18 +244,6 @@ def main(angry_dir, long_tests):
     make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_broken_symlink_names', 'broken_symlink', 253)
     make_all_one_byte_objects(angry_dir, b'symlinks/all_1_byte_self_symlink_names', 'self_symlink', 253)
 
-    if long_tests:
-        # 2 byte names
-        # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
-        # since only NULL and / are invalid, and there is no '..' file
-        # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
-        make_all_two_byte_objects(angry_dir, b'files/all_2_byte_file_names', 'file', 64515)
-
-        make_all_two_byte_objects(angry_dir, b'dirs/all_2_byte_dir_names', 'dir', 64515)  # takes forever to delete
-        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dot', 'symlink', 64515)
-        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dotdot', 'symlink', 64515, b'..')
-        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dev_null', 'symlink', 64515, b'/dev/null')
-        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_broken_symlink_names', 'broken_symlink', 64515)
 
     # all length objects
     # expected file count = 255
@@ -285,6 +258,19 @@ def main(angry_dir, long_tests):
     make_all_length_objects(angry_dir, b'dirs/all_length_dir_names', 'dir', 255)
 
     # max length objects
+
+    if long_tests:
+        # 2 byte names
+        # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
+        # since only NULL and / are invalid, and there is no '..' file
+        # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
+        make_all_two_byte_objects(angry_dir, b'files/all_2_byte_file_names', 'file', 64515)
+
+        make_all_two_byte_objects(angry_dir, b'dirs/all_2_byte_dir_names', 'dir', 64515)  # takes forever to delete
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dot', 'symlink', 64515)
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dotdot', 'symlink', 64515, b'..')
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_symlink_names_to_dev_null', 'symlink', 64515, b'/dev/null')
+        make_all_two_byte_objects(angry_dir, b'symlinks/all_2_byte_broken_symlink_names', 'broken_symlink', 64515)
 
 @click.command()
 @click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1)
