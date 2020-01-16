@@ -296,29 +296,17 @@ def cli(path, long_tests):
     command = ' '.join(['/usr/bin/find', angry_dir.as_posix(), "-printf '\n' |", 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
     print("final_count:", final_count)
+    expected_final_count = TOTALS_DICT['all_symlinks'] + \
+                           TOTALS_DICT['file'] + \
+                           TOTALS_DICT['dir'] + \
+                           TOTALS_DICT['working_dir'] + 3  # top level dirs: dirs, files, symlinks
     if long_tests:
-        expected_final_count = 69113 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
     else:
-        expected_final_count = TOTALS_DICT['all_symlinks'] + \
-                               TOTALS_DICT['file'] + \
-                               TOTALS_DICT['dir'] + \
-                               TOTALS_DICT['working_dir']
-        #expected_final_count = 4089 + (254 + 1) + (255 + 1) + (255 + 1) + (255 + 1)
         print("expected_final_count:", expected_final_count)
         assert final_count == expected_final_count
 
 if __name__ == '__main__':
     cli()
-    #parser = DefaultHelpParser(formatter_class=SmartFormatter, add_help=True)
-    #long_tests_help = 'R|Run tests that may take hours to complete and even longer to delete.\n'
-    #dest_dir_help = 'R|Directory to make files under. Should be empty.\n'
-    #parser.add_argument("dest_dir", help=dest_dir_help, type=str)
-    #parser.add_argument("--long-tests", help=long_tests_help, action="store_true", default=False)
-    #cmd_args = parser.parse_args()
-    #DEST_DIR = os.path.abspath(os.path.expanduser(cmd_args.dest_dir))
-    #os.makedirs(DEST_DIR)
-    #os.chdir(DEST_DIR)
-    #main()
 
