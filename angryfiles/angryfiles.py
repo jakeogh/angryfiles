@@ -263,13 +263,15 @@ def make_all_one_byte_objects(*,
                               ):
     make_working_dir(dest_dir)
 
-    if file_type == 'file':
-        assert self_content is False
+    #if file_type == 'file':
+    assert self_content is False
+
 
     with chdir(dest_dir):
         #os.chdir(dest_dir)
         for byte in writable_one_byte_filenames():
             if self_content:
+                assert False
                 create_object(name=byte,
                               file_type=file_type,
                               target=target,
