@@ -156,12 +156,20 @@ def create_object(*,
         assert not content
 
     if file_type == 'file':
+        if content is None:
+            content = b''
         write_file(name=name, data=content, template_file=template_file)
-    elif file_type == 'dir':
+        return
+
+    if file_type == 'dir':
         os.makedirs(name)
-    elif file_type == 'symlink':
+        return
+
+    if file_type == 'symlink':
         os.symlink(target, name)
-    elif file_type == 'broken_symlink':
+        return
+
+    if file_type == 'broken_symlink':
         # setting target to a random byte does not gurantee a broken symlink
         # in the case of a fixed target like b'a' _at least_ one symlink
         # will be circular and therefore not broken
@@ -177,9 +185,13 @@ def create_object(*,
         non_existing_target = b'../' + str(time.time()).encode('UTF8') + b'/' + name
         # assert non_existing_target does not exist
         os.symlink(non_existing_target, name)
-    elif file_type == 'self_symlink':
+        return
+
+    if file_type == 'self_symlink':
         os.symlink(name, name)
-    elif file_type == 'next_symlinkable_byte':
+        return
+
+    if file_type == 'next_symlinkable_byte':
         # symlink to the next valid symlink target byte
         # next means:
         #   if the symlink name is a single byte:
@@ -192,7 +204,8 @@ def create_object(*,
         # assert next_symlinkable_byte is not b'\x00'
         # os.symlink(next_symlinkable_byte, name)
         pass
-    elif file_type == 'next_symlink':
+
+    if file_type == 'next_symlink':
         # symlink to the next valid symlink _name_ byte
         # "next" means:
         #   if the symlink name is a single byte:
@@ -207,6 +220,8 @@ def create_object(*,
         # assert next_symlink is not b'\x00'
         # os.symlink(next_symlink, name)
         pass
+
+    return
 
 
 def make_all_one_byte_objects(angry_dir,
