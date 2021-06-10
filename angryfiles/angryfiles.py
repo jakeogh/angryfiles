@@ -258,10 +258,13 @@ def make_all_one_byte_objects(*,
                               dest_dir: bytes,
                               file_type: str,
                               count: int,
-                              target: Optional[bytes] = b'.',
-                              self_content: bool = False,
+                              target: Optional[bytes],
+                              self_content: bool,
                               ):
     make_working_dir(dest_dir)
+
+    if file_type == 'file':
+        assert self_content is False
 
     with chdir(dest_dir):
         #os.chdir(dest_dir)
@@ -411,15 +414,16 @@ def main(angry_dir, long_tests):
     # 1 byte names
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False)
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True)
-    make_all_one_byte_objects_each_in_byte_number_folder(angry_dir=angry_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False)
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_1_byte_dir_names', file_type='dir', count=253)
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dot', file_type='symlink', count=253)  # can cause code to fail on recursion +/+/+/+ -> .
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dotdot', file_type='symlink', count=253, target=b'..')
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dev_null', file_type='symlink', count=253, target=b'/dev/null')
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_broken_symlink_names', file_type='broken_symlink', count=253)
-    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_self_symlink_names', file_type='self_symlink', count=253)
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False, target=None,)
+    return
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
+    make_all_one_byte_objects_each_in_byte_number_folder(angry_dir=angry_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_1_byte_dir_names', file_type='dir', count=253, self_content=False, target=None,)
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dot', file_type='symlink', count=253, self_content=False, target=b'.')  # can cause code to fail on recursion +/+/+/+ -> .
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dotdot', file_type='symlink', count=253, self_content=False, target=b'..')
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dev_null', file_type='symlink', count=253, self_content=False, target=b'/dev/null')
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_broken_symlink_names', file_type='broken_symlink', count=253, self_content=False, target=b'.',)
+    make_all_one_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_1_byte_self_symlink_names', file_type='self_symlink', count=253, self_content=False, target=b'.',)
 
     # all length objects
     # expected file count = 255
