@@ -95,7 +95,7 @@ def random_utf8():
 
 def write_file(*,
                name: bytes,
-               data: bytes = b'',
+               data: bytes,
                template_file: Optional[bytes] = None,
                ):
     assert isinstance(name, bytes)
@@ -106,7 +106,7 @@ def write_file(*,
         copy(template_file, name, follow_symlinks=False)
     else:
         with open(name, 'xb') as fh:
-            fh.write(name)
+            fh.write(data)
 
 
 def valid_filename_bytes():
