@@ -313,7 +313,7 @@ def make_all_two_byte_objects(*,
                               dest_dir: bytes,
                               file_type: str,
                               count: int,
-                              target: bytes = b'.',
+                              target: bytes,
                               ):
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -332,7 +332,7 @@ def make_all_two_byte_objects(*,
 def make_one_all_byte_file(*,
                            angry_dir: bytes,
                            dest_dir: bytes,
-                           template_file: bool = None,
+                           template_file: bool,
                            ):
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -438,13 +438,13 @@ def main(angry_dir, long_tests):
         # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
         # since only NULL and / are invalid, and there is no '..' file
         # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
-        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'files/all_2_byte_file_names', file_type='file', count=64515)
+        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'files/all_2_byte_file_names', file_type='file', count=64515, target=None,)
 
-        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_2_byte_dir_names', file_type='dir', count=64515)  # takes forever to delete
-        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dot', file_type='symlink', count=64515)
-        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dotdot', file_type='symlink', count=64515, target=b'..')
-        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dev_null', file_type='symlink', count=64515, target=b'/dev/null')
-        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_broken_symlink_names', file_type='broken_symlink', count=64515)
+        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_2_byte_dir_names', file_type='dir', count=64515, target=None,)  # takes forever to delete
+        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dot', file_type='symlink', count=64515, target=b'.',)
+        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dotdot', file_type='symlink', count=64515, target=b'..',)
+        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dev_null', file_type='symlink', count=64515, target=b'/dev/null',)
+        make_all_two_byte_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_2_byte_broken_symlink_names', file_type='broken_symlink', count=64515, target=b'.',)
 
     # TODO max length objects
 
@@ -452,7 +452,7 @@ def main(angry_dir, long_tests):
 def one_mad_file(angry_dir, template_file):
     make_one_all_byte_file(angry_dir=angry_dir,
                            dest_dir=b'one_mad_file',
-                           template_file=template_file)
+                           template_file=template_file,)
 
 @click.command()
 @click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1)
