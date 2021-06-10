@@ -175,6 +175,7 @@ def create_object(*,
                    'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
                    'link', 'fifo']
 
+    assert content is None
 
     if verbose:
         ic(name, file_type, content, target, template_file,)
