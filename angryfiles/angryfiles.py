@@ -93,7 +93,11 @@ def random_utf8():
     return possible_utf8_bytes
 
 
-def write_file(name, data=b'', template_file=None):
+def write_file(*,
+               name: bytes,
+               data: bytes = b'',
+               template_file: Optional[bytes] = None,
+               ):
     assert isinstance(name, bytes)
     assert isinstance(data, bytes)
     if template_file:
@@ -249,11 +253,12 @@ def create_object(*,
     return
 
 
-def make_all_one_byte_objects(angry_dir,
-                              dest_dir,
+def make_all_one_byte_objects(*,
+                              angry_dir: bytes,
+                              dest_dir: bytes,
                               file_type: str,
                               count: int,
-                              target: bytes = b'.',
+                              target: Optional[bytes] = b'.',
                               self_content: bool = False,
                               ):
     make_working_dir(dest_dir)
@@ -278,8 +283,9 @@ def make_all_one_byte_objects(angry_dir,
                          file_type=file_type,)
 
 
-def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir,
-                                                         dest_dir,
+def make_all_one_byte_objects_each_in_byte_number_folder(*,
+                                                         angry_dir: bytes,
+                                                         dest_dir: bytes,
                                                          file_type: str,
                                                          count: int,
                                                          self_content: bool,
@@ -302,8 +308,9 @@ def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir,
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
 
-def make_all_two_byte_objects(angry_dir,
-                              dest_dir,
+def make_all_two_byte_objects(*,
+                              angry_dir: bytes,
+                              dest_dir: bytes,
                               file_type: str,
                               count: int,
                               target: bytes = b'.',
@@ -322,8 +329,9 @@ def make_all_two_byte_objects(angry_dir,
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
 
 
-def make_one_all_byte_file(angry_dir,
-                           dest_dir,
+def make_one_all_byte_file(*,
+                           angry_dir: bytes,
+                           dest_dir: bytes,
                            template_file: bool = None,
                            ):
     make_working_dir(dest_dir)
