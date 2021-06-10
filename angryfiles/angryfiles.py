@@ -31,11 +31,31 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from shutil import copy
+from typing import ByteString
+from typing import Generator
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Sequence
 
 import click
+from with_chdir import chdir
 
 global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
+
+
+def eprint(*args, **kwargs):
+    if 'file' in kwargs.keys():
+        kwargs.pop('file')
+    print(*args, file=sys.stderr, **kwargs)
+
+
+try:
+    from icecream import ic  # https://github.com/gruns/icecream
+except ImportError:
+    ic = eprint
+
 
 
 def make_working_dir(path):
@@ -144,11 +164,16 @@ def create_object(*,
                   content: bytes,
                   target: bytes = b'.',
                   template_file: bytes = None,
+                  verbose: bool = False,
                   ):  # fixme: dont imply target
 
     valid_types = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
                    'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
                    'link', 'fifo']
+
+
+    if verbose:
+        ic(name, file_type, content, target, template_file,)
 
     assert file_type in valid_types
     if template_file:
@@ -232,22 +257,25 @@ def make_all_one_byte_objects(angry_dir,
                               self_content: bool = False,
                               ):
     make_working_dir(dest_dir)
-    os.chdir(dest_dir)
-    for byte in writable_one_byte_filenames():
-        if self_content:
-            create_object(name=byte,
-                          file_type=file_type,
-                          target=target,
-                          content=byte,)
-        else:
-            create_object(name=byte,
-                          file_type=file_type,
-                          target=target,
-                          content=None,)
-    os.chdir(angry_dir)
-    check_file_count(dest_dir=dest_dir,
-                     count=count,
-                     file_type=file_type,)
+
+    with chdir(dest_dir):
+        #os.chdir(dest_dir)
+        for byte in writable_one_byte_filenames():
+            if self_content:
+                create_object(name=byte,
+                              file_type=file_type,
+                              target=target,
+                              content=byte,)
+            else:
+                create_object(name=byte,
+                              file_type=file_type,
+                              target=target,
+                              content=None,)
+
+    with chdir(angry_dir):
+        check_file_count(dest_dir=dest_dir,
+                         count=count,
+                         file_type=file_type,)
 
 
 def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir,
@@ -311,12 +339,13 @@ def make_one_all_byte_file(angry_dir,
     check_file_count(dest_dir=dest_dir, count=1, file_type='file')
 
 
-def make_all_length_objects(angry_dir,
-                            dest_dir,
+def make_all_length_objects(*,
+                            angry_dir: bytes,
+                            dest_dir: bytes,
                             file_type: str,
                             count: int,
+                            self_content: bool,
                             target: bytes = b'.',
-                            self_content: bool = False,
                             all_bytes: bool = False,
                             ):
     make_working_dir(dest_dir)
@@ -342,7 +371,8 @@ def make_all_length_objects(angry_dir,
             create_object(name=file_name,
                           file_type=file_type,
                           target=target,
-                          content=file_name,)
+                          content=file_name,
+                          verbose=True,)
         else:
             create_object(name=file_name,
                           file_type=file_type,
@@ -382,15 +412,15 @@ def main(angry_dir, long_tests):
 
     # all length objects
     # expected file count = 255
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names', file_type='file', count=255)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names_self_content', file_type='file', count=255, self_content=True)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names', file_type='file', count=255, self_content=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names_self_content', file_type='file', count=255, self_content=True,)
     make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names_all_bytes__self_content', file_type='file', count=255, self_content=True, all_bytes=True)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dot', file_type='symlink', count=255)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dotdot', file_type='symlink', count=255, target=b'..')
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dev_null', file_type='symlink', count=255, target=b'/dev/null')
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_broken_symlink_names', file_type='broken_symlink', count=255)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_self_symlink_names', file_type='self_symlink', count=255)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_length_dir_names', file_type='dir', count=255)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dot', file_type='symlink', count=255, self_content=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dotdot', file_type='symlink', count=255, target=b'..', self_content=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dev_null', file_type='symlink', count=255, target=b'/dev/null', self_content=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_broken_symlink_names', file_type='broken_symlink', count=255, self_content=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_self_symlink_names', file_type='self_symlink', count=255, self_content=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_length_dir_names', file_type='dir', count=255, self_content=False,)
 
     if long_tests:
         # 2 byte names
