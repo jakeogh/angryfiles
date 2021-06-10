@@ -161,11 +161,11 @@ def writable_two_byte_filenames():
 def create_object(*,
                   name: bytes,
                   file_type: str,
-                  content: bytes,
-                  target: bytes = b'.',
-                  template_file: bytes = None,
+                  content: Optional[bytes],
+                  target: Optional[bytes],
+                  template_file: Optional[bytes] = None,
                   verbose: bool = False,
-                  ):  # fixme: dont imply target
+                  ) -> None:  # fixme: dont imply target
 
     valid_types = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
                    'next_symlink', 'next_symlinkable_byte', 'circular_symlink',
@@ -295,7 +295,8 @@ def make_all_one_byte_objects_each_in_byte_number_folder(angry_dir,
             content = byte
         create_object(name=byte,
                       file_type=file_type,
-                      content=content,)
+                      content=content,
+                      target=b'.',)
         os.chdir(b'../')
     os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
@@ -334,7 +335,8 @@ def make_one_all_byte_file(angry_dir,
     create_object(name=file_name,
                   file_type='file',
                   template_file=template_file,
-                  content=None,)
+                  content=None,
+                  target=b'.',)
     os.chdir(angry_dir)
     check_file_count(dest_dir=dest_dir, count=1, file_type='file')
 
@@ -346,43 +348,44 @@ def make_all_length_objects(*,
                             count: int,
                             self_content: bool,
                             target: bytes,
-                            all_bytes: bool = False,
+                            all_bytes: bool,
                             ):
     make_working_dir(dest_dir)
-    os.chdir(dest_dir)
-    byte_length = 1
-    all_valid_bytes = list(valid_filename_bytes())
-    assert all_valid_bytes
-    all_valid_bytes.sort(reverse=True)
-    file_name = None
-    while byte_length < 256:
-        if all_bytes:
-            try:
-                next_byte = all_valid_bytes.pop()
-            except IndexError:
-                next_byte = b'\x01'
-            if file_name is None:
-                file_name = next_byte
+    with chdir(dest_dir):
+        byte_length = 1
+        all_valid_bytes = list(valid_filename_bytes())
+        assert all_valid_bytes
+        all_valid_bytes.sort(reverse=True)
+        file_name = None
+        while byte_length < 256:
+            if all_bytes:
+                try:
+                    next_byte = all_valid_bytes.pop()
+                except IndexError:
+                    next_byte = b'\x01'
+                if file_name is None:
+                    file_name = next_byte
+                else:
+                    file_name = file_name + next_byte
             else:
-                file_name = file_name + next_byte
-        else:
-            file_name = b'a' * byte_length
-        if self_content:
-            create_object(name=file_name,
-                          file_type=file_type,
-                          target=target,
-                          content=file_name,
-                          verbose=True,)
-        else:
-            create_object(name=file_name,
-                          file_type=file_type,
-                          target=target,
-                          content=None,)
-        byte_length += 1
-    os.chdir(angry_dir)
-    check_file_count(dest_dir=dest_dir,
-                     count=count,
-                     file_type=file_type,)
+                file_name = b'a' * byte_length
+            if self_content:
+                create_object(name=file_name,
+                              file_type=file_type,
+                              target=target,
+                              content=file_name,
+                              verbose=True,)
+            else:
+                create_object(name=file_name,
+                              file_type=file_type,
+                              target=target,
+                              content=None,)
+            byte_length += 1
+
+    with chdir(angry_dir):
+        check_file_count(dest_dir=dest_dir,
+                         count=count,
+                         file_type=file_type,)
 
 
 def check_file_count(dest_dir, count, file_type):
