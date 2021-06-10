@@ -177,8 +177,8 @@ def create_object(*,
 
     #assert content is None
 
-    if verbose:
-        ic(name, file_type, content, target, template_file,)
+    #if verbose:
+    #    ic(name, file_type, content, target, template_file,)
 
     assert file_type in valid_types
     if template_file:
@@ -383,7 +383,7 @@ def make_all_length_objects(*,
                               file_type=file_type,
                               target=target,
                               content=file_name,
-                              verbose=True,)
+                              verbose=False,)
             else:
                 create_object(name=file_name,
                               file_type=file_type,
