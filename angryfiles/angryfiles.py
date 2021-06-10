@@ -412,15 +412,15 @@ def main(angry_dir, long_tests):
 
     # all length objects
     # expected file count = 255
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names', file_type='file', count=255, self_content=False, target=None,)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names_self_content', file_type='file', count=255, self_content=True, target=None,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names', file_type='file', count=255, self_content=False, target=None, all_bytes=False)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names_self_content', file_type='file', count=255, self_content=True, target=None, all_bytes=False,)
     make_all_length_objects(angry_dir=angry_dir, dest_dir=b'files/all_length_file_names_all_bytes__self_content', file_type='file', count=255, self_content=True, all_bytes=True, target=b'.',)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dot', file_type='symlink', count=255, self_content=False, target=b'.',)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dotdot', file_type='symlink', count=255, target=b'..', self_content=False,)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dev_null', file_type='symlink', count=255, target=b'/dev/null', self_content=False,)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_broken_symlink_names', file_type='broken_symlink', count=255, self_content=False, target=b'.',)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_self_symlink_names', file_type='self_symlink', count=255, self_content=False, target=b'.',)
-    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_length_dir_names', file_type='dir', count=255, self_content=False, target=None,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dot', file_type='symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dotdot', file_type='symlink', count=255, target=b'..', self_content=False, all_bytes=False)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dev_null', file_type='symlink', count=255, target=b'/dev/null', self_content=False, all_bytes=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_broken_symlink_names', file_type='broken_symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'symlinks/all_length_self_symlink_names', file_type='self_symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
+    make_all_length_objects(angry_dir=angry_dir, dest_dir=b'dirs/all_length_dir_names', file_type='dir', count=255, self_content=False, target=None, all_bytes=False,)
 
     if long_tests:
         # 2 byte names
