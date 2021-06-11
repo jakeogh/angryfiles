@@ -40,6 +40,8 @@ from typing import Optional
 from typing import Sequence
 
 import click
+from asserttool import nevd
+from getdents import paths
 from with_chdir import chdir
 
 global TOTALS_DICT
@@ -457,29 +459,40 @@ def one_mad_file(angry_dir, template_file):
                            template_file=template_file,)
 
 @click.command()
-@click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=-1)
+@click.argument('output_dir', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=-1)
 @click.option('--stdout', is_flag=True)
 @click.option('--long-tests', is_flag=True)
 @click.option('--one-angry-file', is_flag=True)
 @click.option('--template-file', type=click.Path(exists=True, dir_okay=False, file_okay=True, path_type=str, allow_dash=True))
+@click.option('--verbose', is_flag=True)
+@click.option('--debug', is_flag=True)
 @click.pass_context
 def cli(ctx, *,
-        path: str,
+        output_dir: str,
         stdout: bool,
         long_tests: bool,
         one_angry_file: bool,
         template_file: str,
+        verbose: bool,
+        debug: bool,
         ):
 
-    if not path:
+    ctx.ensure_object(dict)
+    null, end, verbose, debug = nevd(ctx=ctx,
+                                     printn=False,
+                                     ipython=False,
+                                     verbose=verbose,
+                                     debug=debug,)
+
+    if not output_dir:
         assert stdout
         angry_dir = Path(TemporaryDirectory(prefix='tmp-angryfiles-',
                                             dir='/tmp',).name)
     else:
-        angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
+        angry_dir = Path(output_dir).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
 
     if angry_dir.exists():
-        raise ValueError("path: {} already exists".format(angry_dir))
+        raise ValueError("output_dir: {} already exists".format(angry_dir))
     angry_dir.mkdir()
 
     os.chdir(angry_dir)
@@ -517,3 +530,6 @@ def cli(ctx, *,
         print("expected_final_count:", expected_final_count)
     assert final_count == expected_final_count
 
+    if stdout:
+        for path in paths(angry_dir, verbose=verbose, debug=debug,):
+            sys.stdout.buffer.write(path.path + end)
