@@ -493,10 +493,8 @@ def cli(ctx, *,
                                   TOTALS_DICT['broken_symlink'] + \
                                   TOTALS_DICT['self_symlink'] + \
                                   TOTALS_DICT['circular_symlink']
-    pprint.pprint(TOTALS_DICT)
     command = ' '.join(['/usr/bin/find', angry_dir.as_posix(), "-printf '\n' |", 'wc -l'])
     final_count = int(subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True))
-    print("final_count:", final_count)
 
     if one_angry_file:
         top_level = 1   # angry_dir
@@ -509,9 +507,13 @@ def cli(ctx, *,
                            TOTALS_DICT['file'] + \
                            TOTALS_DICT['dir'] + \
                            TOTALS_DICT['working_dir'] + top_level
-    if long_tests:
+    #if long_tests:
+    #    print("expected_final_count:", expected_final_count)
+    #    assert final_count == expected_final_count
+    #else:
+    if not stdout:
+        pprint.pprint(TOTALS_DICT)
+        print("final_count:", final_count)
         print("expected_final_count:", expected_final_count)
-        assert final_count == expected_final_count
-    else:
-        print("expected_final_count:", expected_final_count)
-        assert final_count == expected_final_count
+    assert final_count == expected_final_count
+
