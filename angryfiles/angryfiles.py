@@ -474,7 +474,7 @@ def cli(ctx, *,
     if not path:
         assert stdout
         angry_dir = Path(TemporaryDirectory(prefix='tmp-angryfiles-',
-                                            dir='/tmp',))
+                                            dir='/tmp',).name)
     else:
         angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
 
