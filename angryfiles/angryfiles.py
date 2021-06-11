@@ -478,10 +478,9 @@ def cli(ctx, *,
     else:
         angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
 
-        if angry_dir.exists():
-            raise ValueError("path: {} already exists".format(angry_dir))
-        angry_dir.mkdir()
-
+    if angry_dir.exists():
+        raise ValueError("path: {} already exists".format(angry_dir))
+    angry_dir.mkdir()
 
     os.chdir(angry_dir)
     if one_angry_file:
