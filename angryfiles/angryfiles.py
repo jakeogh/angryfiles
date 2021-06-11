@@ -31,6 +31,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from shutil import copy
+from tempfile import TemporaryDirectory
 from typing import ByteString
 from typing import Generator
 from typing import Iterable
@@ -456,16 +457,32 @@ def one_mad_file(angry_dir, template_file):
                            template_file=template_file,)
 
 @click.command()
-@click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1)
+@click.argument('path', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=-1)
+@click.option('--stdout', is_flag=True)
 @click.option('--long-tests', is_flag=True)
 @click.option('--one-angry-file', is_flag=True)
 @click.option('--template-file', type=click.Path(exists=True, dir_okay=False, file_okay=True, path_type=str, allow_dash=True))
-def cli(path, long_tests, one_angry_file, template_file):
-    angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
-    if angry_dir.exists():
-        raise ValueError("path: {} already exists".format(angry_dir))
+@click.pass_context
+def cli(ctx, *,
+        path: str,
+        stdout: bool,
+        long_tests: bool,
+        one_angry_file: bool,
+        template_file: str,
+        ):
 
-    angry_dir.mkdir()
+    if not path:
+        assert stdout
+        angry_dir = Path(TemporaryDirectory(prefix='tmp-angryfiles-',
+                                            dir='/tmp',))
+    else:
+        angry_dir = Path(path).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
+
+        if angry_dir.exists():
+            raise ValueError("path: {} already exists".format(angry_dir))
+        angry_dir.mkdir()
+
+
     os.chdir(angry_dir)
     if one_angry_file:
         one_mad_file(angry_dir=angry_dir, template_file=template_file)
