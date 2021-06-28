@@ -61,7 +61,7 @@ except ImportError:
 
 def make_working_dir(path) -> None:
     os.makedirs(path)
-    ic(Path(path).parts)
+    ic(Path(os.fsencode(path)).parts)
     TOTALS_DICT['working_dir'] += 1
 
 
