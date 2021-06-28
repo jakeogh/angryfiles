@@ -62,11 +62,11 @@ except ImportError:
 def make_working_dir(path) -> None:
     os.makedirs(path)
     #ic(Path(os.fsdecode(path)).parts)
-    #new_dir_count = len(Path(os.fsdecode(path)).parts) - 1 # bug if other tests use same subfolder
-    new_dir_count = len(Path(os.fsdecode(path)).parts) # bug if other tests use same subfolder
+    new_dir_count = len(Path(os.fsdecode(path)).parts) - 1 # bug if other tests use same subfolder
+    #new_dir_count = len(Path(os.fsdecode(path)).parts) # bug if other tests use same subfolder
     #ic(new_dir_count)
-    #TOTALS_DICT['working_dir'] += max(1, new_dir_count)
-    TOTALS_DICT['working_dir'] += new_dir_count
+    TOTALS_DICT['working_dir'] += max(1, new_dir_count)
+    #TOTALS_DICT['working_dir'] += new_dir_count
 
 
 def random_bytes(count):
