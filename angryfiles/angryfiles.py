@@ -294,6 +294,7 @@ def make_all_one_byte_objects_each_in_byte_number_folder(*,
                                                          file_type: str,
                                                          count: int,
                                                          self_content: bool,
+                                                         prepend: Optional[bytes] = None,
                                                          ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -304,6 +305,8 @@ def make_all_one_byte_objects_each_in_byte_number_folder(*,
         content = None
         if self_content:
             content = byte
+        if prepend:
+            byte = prepend + byte
         create_object(name=byte,
                       file_type=file_type,
                       content=content,
@@ -423,6 +426,7 @@ def main(root_dir, long_tests):
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_prepended_with_~', file_type='file', count=253, self_content=False, target=None, prepend=b'~')
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
     make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
+    make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder_prepended_with_~', file_type='file', count=253, self_content=False, prepend=b'~')
     make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names_one_per_folder', file_type='dir', count=253, self_content=False,)  # not counting the parent int folders?
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names', file_type='dir', count=253, self_content=False, target=None,)
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dot', file_type='symlink', count=253, self_content=False, target=b'.')  # can cause code to fail on recursion +/+/+/+ -> .
