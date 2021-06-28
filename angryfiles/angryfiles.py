@@ -423,7 +423,7 @@ def main(root_dir, long_tests):
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False, target=None,)
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_with_a_~_folder/~', file_type='file', count=253, self_content=False, target=None,)
+    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_with_a_~_folder/~', file_type='file', count=254, self_content=False, target=None,)  # 254 not 253 because of the ~ parent dir
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_prepended_with_~', file_type='file', count=253, self_content=False, target=None, prepend=b'~')
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
     make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
