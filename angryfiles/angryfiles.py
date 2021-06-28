@@ -490,6 +490,9 @@ def cli(ctx, *,
         root_dir = Path(TemporaryDirectory(prefix='tmp-angryfiles-',
                                             dir='/tmp',).name)
     else:
+        assert len(output_dir) == 1
+        output_dir = output_dir[0]
+        #ic(output_dir)
         root_dir = Path(output_dir).expanduser().absolute()  #hmmm. ~ is a valid path name Bug.
 
     if root_dir.exists():
