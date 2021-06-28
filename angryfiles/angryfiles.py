@@ -419,6 +419,7 @@ def main(root_dir, long_tests):
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False, target=None,)
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
     make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
+    make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names_one_per_folder', file_type='dir', count=253, self_content=False,)  # not counting the parent int folders?
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names', file_type='dir', count=253, self_content=False, target=None,)
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dot', file_type='symlink', count=253, self_content=False, target=b'.')  # can cause code to fail on recursion +/+/+/+ -> .
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dotdot', file_type='symlink', count=253, self_content=False, target=b'..')
