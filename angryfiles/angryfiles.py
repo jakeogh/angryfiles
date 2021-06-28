@@ -262,12 +262,15 @@ def make_all_one_byte_objects(*,
                               count: int,
                               target: Optional[bytes],
                               self_content: bool,
+                              prepend: Optional[bytes] = None,
                               ):
     make_working_dir(dest_dir)
 
     with chdir(dest_dir):
         #os.chdir(dest_dir)
         for byte in writable_one_byte_filenames():
+            if prepend:
+                byte = prepend + byte
             if self_content:
                 create_object(name=byte,
                               file_type=file_type,
@@ -417,6 +420,7 @@ def main(root_dir, long_tests):
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False, target=None,)
+    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_prepended_with_~', file_type='file', count=253, self_content=False, target=None, prepend=b'~')
     make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
     make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
     make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names_one_per_folder', file_type='dir', count=253, self_content=False,)  # not counting the parent int folders?
