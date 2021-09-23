@@ -39,24 +39,14 @@ from typing import Optional
 from typing import Sequence
 
 import click
+from asserttool import eprint
+from asserttool import ic
 from asserttool import nevd
 from getdents import paths
 from with_chdir import chdir
 
 global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
-
-
-def eprint(*args, **kwargs):
-    if 'file' in kwargs.keys():
-        kwargs.pop('file')
-    print(*args, file=sys.stderr, **kwargs)
-
-
-try:
-    from icecream import ic  # https://github.com/gruns/icecream
-except ImportError:
-    ic = eprint
 
 
 def make_working_dir(path) -> None:
@@ -86,7 +76,7 @@ def get_random_filename():
 
 
 # evaluate /usr/lib64/python3.4/site-packages/bs4/dammit.py
-def random_utf8() -> str:
+def random_utf8() -> bytes:
     gotutf8 = False
     while not gotutf8:
         codepoint = random.SystemRandom().randint(0, 4294967296)
@@ -345,7 +335,7 @@ def make_all_two_byte_objects(*,
 def make_one_all_byte_file(*,
                            root_dir: bytes,
                            dest_dir: bytes,
-                           template_file: bool,
+                           template_file: Optional[bytes],
                            ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
