@@ -49,17 +49,13 @@ global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
 
 
-def make_working_dir(path) -> None:
-    os.makedirs(path)
-    #ic(Path(os.fsdecode(path)).parts)
+def make_working_dir(path: Path) -> None:
+    path.mkdir(parents=True)
     new_dir_count = len(Path(os.fsdecode(path)).parts) - 1 # bug if other tests use same subfolder
-    #new_dir_count = len(Path(os.fsdecode(path)).parts) # bug if other tests use same subfolder
-    #ic(new_dir_count)
     TOTALS_DICT['working_dir'] += max(1, new_dir_count)
-    #TOTALS_DICT['working_dir'] += new_dir_count
 
 
-def random_bytes(count):
+def random_bytes(count: int) -> bytes:
     assert isinstance(count, int)
     with open('/dev/urandom', "rb") as fd:
         return fd.read(count)
@@ -69,7 +65,7 @@ def random_filename_length() -> int:
     return random.SystemRandom().randint(0, 255)  # returns max of 255
 
 
-def get_random_filename():
+def get_random_filename() -> bytes:
     length = random_filename_length()
     name = random_bytes(length)  # broken
     return name
@@ -105,7 +101,7 @@ def write_file(*,
             fh.write(data)
 
 
-def valid_filename_bytes():
+def valid_filename_bytes() -> set[bytes]:
     '''
         valid bytes to include in a filename
 
@@ -115,8 +111,8 @@ def valid_filename_bytes():
             '.' (46) is not a valid single byte filename to create  bytes([46]) == b'.' == b'\x2E'
                 since it always already exists
     '''
-    ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
     # old_method = set([bytes(chr(x), encoding='Latin-1') for x in range(0, 256)]) - set([b'\x00', b'\x2F'])
+    ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
     another_method = set([bytes([x]) for x in range(0, 256) if x not in (0, 0x2f)])      # python@altendky
     # assert ans == old_method
     assert ans == another_method
@@ -129,8 +125,9 @@ def valid_filename_bytes():
     return ans
 
 
-def valid_symlink_dest_bytes():  # todo use
-    ans = valid_filename_bytes() | set(b'/')
+def valid_symlink_dest_bytes() -> set[bytes]:  # todo use
+    #ans = valid_filename_bytes() | set(b'/')
+    ans = valid_filename_bytes() | {b'/'}
     assert len(ans) == 255
     assert b'\x2F' in ans  # /
     assert b'/' in ans     # /
