@@ -41,7 +41,9 @@ from typing import Sequence
 import click
 from asserttool import eprint
 from asserttool import ic
-from asserttool import nevd
+from asserttool import tv
+from clicktool import click_add_options
+from clicktool import click_global_options
 from getdents import paths
 from with_chdir import chdir
 
@@ -467,8 +469,7 @@ def one_mad_file(root_dir, template_file):
 @click.option('--long-tests', is_flag=True)
 @click.option('--one-angry-file', is_flag=True)
 @click.option('--template-file', type=click.Path(exists=True, dir_okay=False, file_okay=True, path_type=str, allow_dash=True))
-@click.option('--verbose', is_flag=True)
-@click.option('--debug', is_flag=True)
+@click_add_options(click_global_options)
 @click.pass_context
 def cli(ctx, *,
         output_dir: str,
@@ -476,16 +477,17 @@ def cli(ctx, *,
         long_tests: bool,
         one_angry_file: bool,
         template_file: str,
-        verbose: bool,
-        debug: bool,
+        verbose: int,
+        verbose_inf: bool,
         ):
 
-    ctx.ensure_object(dict)
-    null, end, verbose, debug = nevd(ctx=ctx,
-                                     printn=False,
-                                     ipython=False,
-                                     verbose=verbose,
-                                     debug=debug,)
+    tty, verbose = tv(ctx=ctx,
+                      verbose=verbose,
+                      verbose_inf=verbose_inf,
+                      )
+    end = b'\0'
+    if tty:
+        end = b'\n'
 
     if not output_dir:
         assert stdout
@@ -537,5 +539,5 @@ def cli(ctx, *,
     assert final_count == expected_final_count
 
     if stdout:
-        for path in paths(root_dir, verbose=verbose, debug=debug,):
+        for path in paths(root_dir, verbose=verbose,):
             sys.stdout.buffer.write(path.path + end)
