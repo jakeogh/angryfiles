@@ -51,8 +51,10 @@ global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
 
 
-def make_working_dir(path: Path) -> None:
-    path.mkdir(parents=True)
+def make_working_dir(path: bytes) -> None:
+    assert isinstance(path, bytes)
+    os.makedirs(path)
+    #path.mkdir(parents=True)
     new_dir_count = len(Path(os.fsdecode(path)).parts) - 1 # bug if other tests use same subfolder
     TOTALS_DICT['working_dir'] += max(1, new_dir_count)
 
