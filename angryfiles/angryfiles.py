@@ -297,7 +297,7 @@ def make_all_one_byte_objects_each_in_byte_number_folder(*,
     os.chdir(dest_dir)
     for byte in writable_one_byte_filenames():
         byte_folder = str(ord(byte)).zfill(3)
-        make_working_dir(byte_folder)
+        make_working_dir(byte_folder.encode('utf8'))
         os.chdir(byte_folder)
         content = None
         if self_content:
