@@ -191,6 +191,7 @@ def create_object(*,
         return
 
     if file_type == 'symlink':
+        assert target
         os.symlink(target, name)
         return
 
