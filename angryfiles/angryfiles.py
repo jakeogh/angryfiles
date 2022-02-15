@@ -37,14 +37,16 @@ from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Sequence
+from typing import Union
 
 import click
-from asserttool import eprint
 from asserttool import ic
-from asserttool import tv
 from clicktool import click_add_options
 from clicktool import click_global_options
+from clicktool import tv
+from eprint import eprint
 from getdents import paths
+from mptool import output
 from with_chdir import chdir
 
 global TOTALS_DICT
@@ -165,7 +167,7 @@ def create_object(*,
                   content: Optional[bytes],
                   target: Optional[bytes],
                   template_file: Optional[bytes] = None,
-                  verbose: bool = False,
+                  verbose: Union[bool, int, float],
                   ) -> None:  # fixme: dont imply target
 
     valid_types = ['file', 'dir', 'symlink', 'broken_symlink', 'self_symlink',
@@ -259,6 +261,7 @@ def make_all_one_byte_objects(*,
                               count: int,
                               target: Optional[bytes],
                               self_content: bool,
+                              verbose: Union[bool, int, float],
                               prepend: Optional[bytes] = None,
                               ):
     make_working_dir(dest_dir)
@@ -272,17 +275,23 @@ def make_all_one_byte_objects(*,
                 create_object(name=byte,
                               file_type=file_type,
                               target=target,
-                              content=byte,)
+                              content=byte,
+                              verbose=verbose,
+                              )
             else:
                 create_object(name=byte,
                               file_type=file_type,
                               target=target,
-                              content=None,)
+                              content=None,
+                              verbose=verbose,
+                              )
 
     with chdir(root_dir):
         check_file_count(dest_dir=dest_dir,
                          count=count,
-                         file_type=file_type,)
+                         file_type=file_type,
+                         verbose=verbose,
+                         )
 
 
 def make_all_one_byte_objects_each_in_byte_number_folder(*,
@@ -291,6 +300,7 @@ def make_all_one_byte_objects_each_in_byte_number_folder(*,
                                                          file_type: str,
                                                          count: int,
                                                          self_content: bool,
+                                                         verbose: Union[bool, int, float],
                                                          prepend: Optional[bytes] = None,
                                                          ) -> None:
     make_working_dir(dest_dir)
@@ -307,10 +317,12 @@ def make_all_one_byte_objects_each_in_byte_number_folder(*,
         create_object(name=byte,
                       file_type=file_type,
                       content=content,
-                      target=b'.',)
+                      target=b'.',
+                      verbose=verbose,
+                      )
         os.chdir(b'../')
     os.chdir(root_dir)
-    check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
+    check_file_count(dest_dir=dest_dir, count=count, file_type=file_type, verbose=verbose,)
 
 
 def make_all_two_byte_objects(*,
@@ -319,6 +331,7 @@ def make_all_two_byte_objects(*,
                               file_type: str,
                               count: int,
                               target: bytes,
+                              verbose: Union[bool, int, float],
                               ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -329,15 +342,18 @@ def make_all_two_byte_objects(*,
                 create_object(name=file_name,
                               file_type=file_type,
                               target=target,
-                              content=None,)
+                              content=None,
+                              verbose=verbose,
+                              )
     os.chdir(root_dir)
-    check_file_count(dest_dir=dest_dir, count=count, file_type=file_type)
+    check_file_count(dest_dir=dest_dir, count=count, file_type=file_type, verbose=verbose,)
 
 
 def make_one_all_byte_file(*,
                            root_dir: bytes,
                            dest_dir: bytes,
                            template_file: Optional[bytes],
+                           verbose: Union[bool, int, float],
                            ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -349,9 +365,11 @@ def make_one_all_byte_file(*,
                   file_type='file',
                   template_file=template_file,
                   content=None,
-                  target=b'.',)
+                  target=b'.',
+                  verbose=verbose,
+                  )
     os.chdir(root_dir)
-    check_file_count(dest_dir=dest_dir, count=1, file_type='file')
+    check_file_count(dest_dir=dest_dir, count=1, file_type='file', verbose=verbose,)
 
 
 def make_all_length_objects(*,
@@ -362,6 +380,7 @@ def make_all_length_objects(*,
                             self_content: bool,
                             target: bytes,
                             all_bytes: bool,
+                            verbose: Union[bool, int, float],
                             ) -> None:
     make_working_dir(dest_dir)
     with chdir(dest_dir):
@@ -387,23 +406,29 @@ def make_all_length_objects(*,
                               file_type=file_type,
                               target=target,
                               content=file_name,
-                              verbose=False,)
+                              verbose=verbose,
+                              )
             else:
                 create_object(name=file_name,
                               file_type=file_type,
                               target=target,
-                              content=None,)
+                              content=None,
+                              verbose=verbose,
+                              )
             byte_length += 1
 
     with chdir(root_dir):
         check_file_count(dest_dir=dest_dir,
                          count=count,
-                         file_type=file_type,)
+                         file_type=file_type,
+                         verbose=verbose,
+                         )
 
 
-def check_file_count(dest_dir: str,
+def check_file_count(dest_dir: bytes,
                      count: int,
                      file_type: str,
+                     verbose: Union[bool, int, float],
                      ):
     if not os.path.isdir(dest_dir):
         print("dest_dir:", dest_dir, "is not a dir")
@@ -415,56 +440,60 @@ def check_file_count(dest_dir: str,
     TOTALS_DICT[file_type] += manual_count
 
 
-def main(root_dir, long_tests):
+def main(root_dir,
+         long_tests: bool,
+         verbose: Union[bool, int, float],
+         ):
     # 1 byte names
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
     # /bin/ls -A 1/1_byte_file_names | wc -l returns 254 because one file is '\n'
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False, target=None,)
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_with_a_~_folder/~', file_type='file', count=253, self_content=False, target=None,)  # 254 not 253 because of the ~ parent dir, but cant set here
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_prepended_with_~', file_type='file', count=253, self_content=False, target=None, prepend=b'~')
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
-    make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
-    make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder_prepended_with_~', file_type='file', count=253, self_content=False, prepend=b'~')
-    make_all_one_byte_objects_each_in_byte_number_folder(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names_one_per_folder', file_type='dir', count=253, self_content=False,)  # not counting the parent int folders?
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names', file_type='dir', count=253, self_content=False, target=None,)
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dot', file_type='symlink', count=253, self_content=False, target=b'.')  # can cause code to fail on recursion +/+/+/+ -> .
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dotdot', file_type='symlink', count=253, self_content=False, target=b'..')
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dev_null', file_type='symlink', count=253, self_content=False, target=b'/dev/null')
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_broken_symlink_names', file_type='broken_symlink', count=253, self_content=False, target=b'.',)
-    make_all_one_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_self_symlink_names', file_type='self_symlink', count=253, self_content=False, target=b'.',)
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names', file_type='file', count=253, self_content=False, target=None,)
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_with_a_~_folder/~', file_type='file', count=253, self_content=False, target=None,)  # 254 not 253 because of the ~ parent dir, but cant set here
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_prepended_with_~', file_type='file', count=253, self_content=False, target=None, prepend=b'~')
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_self_content', file_type='file', count=253, self_content=True, target=None,)
+    make_all_one_byte_objects_each_in_byte_number_folder(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder', file_type='file', count=253, self_content=False,)
+    make_all_one_byte_objects_each_in_byte_number_folder(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_1_byte_file_names_one_per_folder_prepended_with_~', file_type='file', count=253, self_content=False, prepend=b'~')
+    make_all_one_byte_objects_each_in_byte_number_folder(verbose=verbose, root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names_one_per_folder', file_type='dir', count=253, self_content=False,)  # not counting the parent int folders?
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'dirs/all_1_byte_dir_names', file_type='dir', count=253, self_content=False, target=None,)
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dot', file_type='symlink', count=253, self_content=False, target=b'.')  # can cause code to fail on recursion +/+/+/+ -> .
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dotdot', file_type='symlink', count=253, self_content=False, target=b'..')
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_symlink_names_to_dev_null', file_type='symlink', count=253, self_content=False, target=b'/dev/null')
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_broken_symlink_names', file_type='broken_symlink', count=253, self_content=False, target=b'.',)
+    make_all_one_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_1_byte_self_symlink_names', file_type='self_symlink', count=253, self_content=False, target=b'.',)
 
     # all length objects
     # expected file count = 255
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'files/all_length_file_names', file_type='file', count=255, self_content=False, target=None, all_bytes=False)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'files/all_length_file_names_self_content', file_type='file', count=255, self_content=True, target=None, all_bytes=False,)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'files/all_length_file_names_all_bytes__self_content', file_type='file', count=255, self_content=True, all_bytes=True, target=b'.',)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dot', file_type='symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dotdot', file_type='symlink', count=255, target=b'..', self_content=False, all_bytes=False)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dev_null', file_type='symlink', count=255, target=b'/dev/null', self_content=False, all_bytes=False,)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'symlinks/all_length_broken_symlink_names', file_type='broken_symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'symlinks/all_length_self_symlink_names', file_type='self_symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
-    make_all_length_objects(root_dir=root_dir, dest_dir=b'dirs/all_length_dir_names', file_type='dir', count=255, self_content=False, target=None, all_bytes=False,)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_length_file_names', file_type='file', count=255, self_content=False, target=None, all_bytes=False)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_length_file_names_self_content', file_type='file', count=255, self_content=True, target=None, all_bytes=False,)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_length_file_names_all_bytes__self_content', file_type='file', count=255, self_content=True, all_bytes=True, target=b'.',)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dot', file_type='symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dotdot', file_type='symlink', count=255, target=b'..', self_content=False, all_bytes=False)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_length_symlink_names_to_dev_null', file_type='symlink', count=255, target=b'/dev/null', self_content=False, all_bytes=False,)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_length_broken_symlink_names', file_type='broken_symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_length_self_symlink_names', file_type='self_symlink', count=255, self_content=False, target=b'.', all_bytes=False,)
+    make_all_length_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'dirs/all_length_dir_names', file_type='dir', count=255, self_content=False, target=None, all_bytes=False,)
 
     if long_tests:
         # 2 byte names
         # expected file count = (255 - 1) * (255 - 1) = 64516 - 1 = 64515
         # since only NULL and / are invalid, and there is no '..' file
         # /bin/ls -A -f --hide-control-chars 1/2_byte_file_names | wc -l returns 64515
-        make_all_two_byte_objects(root_dir=root_dir, dest_dir=b'files/all_2_byte_file_names', file_type='file', count=64515, target=None,)
-
-        make_all_two_byte_objects(root_dir=root_dir, dest_dir=b'dirs/all_2_byte_dir_names', file_type='dir', count=64515, target=None,)  # takes forever to delete
-        make_all_two_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dot', file_type='symlink', count=64515, target=b'.',)
-        make_all_two_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dotdot', file_type='symlink', count=64515, target=b'..',)
-        make_all_two_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dev_null', file_type='symlink', count=64515, target=b'/dev/null',)
-        make_all_two_byte_objects(root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_broken_symlink_names', file_type='broken_symlink', count=64515, target=b'.',)
+        make_all_two_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'files/all_2_byte_file_names', file_type='file', count=64515, target=None,)
+        make_all_two_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'dirs/all_2_byte_dir_names', file_type='dir', count=64515, target=None,)  # takes forever to delete
+        make_all_two_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dot', file_type='symlink', count=64515, target=b'.',)
+        make_all_two_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dotdot', file_type='symlink', count=64515, target=b'..',)
+        make_all_two_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_symlink_names_to_dev_null', file_type='symlink', count=64515, target=b'/dev/null',)
+        make_all_two_byte_objects(verbose=verbose, root_dir=root_dir, dest_dir=b'symlinks/all_2_byte_broken_symlink_names', file_type='broken_symlink', count=64515, target=b'.',)
 
     # TODO max length objects
 
 
-def one_mad_file(root_dir, template_file):
+def one_mad_file(root_dir, template_file, verbose):
     make_one_all_byte_file(root_dir=root_dir,
                            dest_dir=b'one_mad_file',
-                           template_file=template_file,)
+                           template_file=template_file,
+                           verbose=verbose,
+                           )
 
 @click.command()
 @click.argument('output_dir', type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1)
@@ -480,7 +509,7 @@ def cli(ctx, *,
         long_tests: bool,
         one_angry_file: bool,
         template_file: str,
-        verbose: int,
+        verbose: Union[bool, int, float],
         verbose_inf: bool,
         ):
 
@@ -488,9 +517,6 @@ def cli(ctx, *,
                       verbose=verbose,
                       verbose_inf=verbose_inf,
                       )
-    end = b'\0'
-    if tty:
-        end = b'\n'
 
     if not output_dir:
         assert stdout
@@ -506,10 +532,10 @@ def cli(ctx, *,
 
     os.chdir(root_dir)
     if one_angry_file:
-        one_mad_file(root_dir=root_dir, template_file=template_file)
+        one_mad_file(root_dir=root_dir, template_file=template_file, verbose=verbose)
     else:
         assert not template_file
-        main(root_dir=root_dir, long_tests=long_tests)
+        main(root_dir=root_dir, long_tests=long_tests, verbose=verbose)
 
     TOTALS_DICT['all_symlinks'] = TOTALS_DICT['symlink'] + \
                                   TOTALS_DICT['broken_symlink'] + \
@@ -541,4 +567,4 @@ def cli(ctx, *,
 
     if stdout:
         for path in paths(root_dir, verbose=verbose,):
-            sys.stdout.buffer.write(path.path + end)
+            output(path.path, tty=tty, verbose=verbose)
