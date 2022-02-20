@@ -128,8 +128,8 @@ def valid_filename_bytes() -> Set[List[bytes]]:
             since it always already exists
     """
     # old_method = set([bytes(chr(x), encoding='Latin-1') for x in range(0, 256)]) - set([b'\x00', b'\x2F'])
-    # ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
-    ans = {[bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))]}
+    ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
+    # ans = {[bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))]}  # TypeError: unhashable type: 'list'
     another_method = set(
         [bytes([x]) for x in range(0, 256) if x not in (0, 0x2F)]
     )  # python@altendky
