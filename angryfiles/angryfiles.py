@@ -869,6 +869,17 @@ def cli(
         + TOTALS_DICT["working_dir"]
         + top_level
     )
+
+    # symlink verification
+    # broken_symlink + circular_symlink + self_symlink + symlink == all_symlinks
+    # note 'symlink' should be named 'unbroken_symlinks_to_another_location'
+    assert (
+        TOTALS_DICT["broken_symlink"]
+        + TOTALS_DICT["circular_symlink"]
+        + TOTALS_DICT["self_symlink"]
+        + TOTALS_DICT["symlink"]
+    ) == TOTALS_DICT["all_symlinks"]
+
     # if long_tests:
     #    print("expected_final_count:", expected_final_count)
     #    assert final_count == expected_final_count
