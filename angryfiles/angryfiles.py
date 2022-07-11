@@ -809,6 +809,7 @@ def cli(
     template_file: str,
     verbose: Union[bool, int, float],
     verbose_inf: bool,
+    dict_input: bool,
 ):
 
     tty, verbose = tv(
@@ -895,4 +896,6 @@ def cli(
             root_dir,
             verbose=verbose,
         ):
-            output(path.path, tty=tty, verbose=verbose)
+            output(
+                path.path, reason=path, tty=tty, dict_input=dict_input, verbose=verbose
+            )
