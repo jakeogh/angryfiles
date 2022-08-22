@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 
 # flake8: noqa
-# pylint: disable=C0111  # docstrings are always outdated and wrong
-# pylint: disable=W0511  # todo is encouraged
-# pylint: disable=C0301  # line too long
-# pylint: disable=R0902  # too many instance attributes
-# pylint: disable=C0302  # too many lines in module
-# pylint: disable=C0103  # single letter var names, func name too descriptive
-# pylint: disable=R0911  # too many return statements
-# pylint: disable=R0912  # too many branches
-# pylint: disable=R0915  # too many statements
-# pylint: disable=R0913  # too many arguments
-# pylint: disable=R1702  # too many nested blocks
-# pylint: disable=R0914  # too many local variables
-# pylint: disable=R0903  # too few public methods
-# pylint: disable=E1101  # no member for base
-# pylint: disable=W0201  # attribute defined outside __init__
-# pylint: disable=R0916  # Too many boolean expressions in if statement
-
+# pylint: disable=missing-docstring               # [C0111] docstrings are always outdated and wrong
+# pylint: disable=fixme                           # [W0511] todo is encouraged
+# pylint: disable=line-too-long                   # [C0301]
+# pylint: disable=too-many-instance-attributes    # [R0902]
+# pylint: disable=too-many-lines                  # [C0302] too many lines in module
+# pylint: disable=invalid-name                    # [C0103] single letter var names, name too descriptive
+# pylint: disable=too-many-return-statements      # [R0911]
+# pylint: disable=too-many-branches               # [R0912]
+# pylint: disable=too-many-statements             # [R0915]
+# pylint: disable=too-many-arguments              # [R0913]
+# pylint: disable=too-many-nested-blocks          # [R1702]
+# pylint: disable=too-many-locals                 # [R0914]
+# pylint: disable=too-few-public-methods          # [R0903]
+# pylint: disable=no-member                       # [E1101] no member for base
+# pylint: disable=attribute-defined-outside-init  # [W0201]
+# pylint: disable=too-many-boolean-expressions    # [R0916] in if statement
+from __future__ import annotations
 
 import itertools
 import os
@@ -28,17 +28,14 @@ import subprocess
 import sys
 import time
 from collections import defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 from shutil import copy
 from tempfile import TemporaryDirectory
 from typing import ByteString
 from typing import Generator
 from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Sequence
 from typing import Set
-from typing import Union
 
 import click
 from asserttool import ic
@@ -101,7 +98,7 @@ def write_file(
     *,
     name: bytes,
     data: bytes,
-    template_file: Optional[bytes] = None,
+    template_file: None | bytes = None,
 ):
     assert isinstance(name, bytes)
     assert isinstance(data, bytes)
@@ -117,7 +114,7 @@ def write_file(
 
 
 # prob should be Set[bytes]
-def valid_filename_bytes() -> Set[List[bytes]]:
+def valid_filename_bytes() -> Set[list[bytes]]:
     """
     valid bytes to include in a filename
 
@@ -178,10 +175,10 @@ def create_object(
     *,
     name: bytes,
     file_type: str,
-    content: Optional[bytes],
-    target: Optional[bytes],
-    template_file: Optional[bytes] = None,
-    verbose: Union[bool, int, float],
+    content: None | bytes,
+    target: None | bytes,
+    template_file: None | bytes = None,
+    verbose: bool | int | float,
 ) -> None:  # fixme: dont imply target
 
     valid_types = [
@@ -283,10 +280,10 @@ def make_all_one_byte_objects(
     dest_dir: bytes,
     file_type: str,
     count: int,
-    target: Optional[bytes],
+    target: None | bytes,
     self_content: bool,
-    verbose: Union[bool, int, float],
-    prepend: Optional[bytes] = None,
+    verbose: bool | int | float,
+    prepend: None | bytes = None,
 ):
     make_working_dir(dest_dir)
 
@@ -327,8 +324,8 @@ def make_all_one_byte_objects_each_in_byte_number_folder(
     file_type: str,
     count: int,
     self_content: bool,
-    verbose: Union[bool, int, float],
-    prepend: Optional[bytes] = None,
+    verbose: bool | int | float,
+    prepend: None | bytes = None,
 ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -365,7 +362,7 @@ def make_all_two_byte_objects(
     file_type: str,
     count: int,
     target: bytes,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
 ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -395,8 +392,8 @@ def make_one_all_byte_file(
     *,
     root_dir: bytes,
     dest_dir: bytes,
-    template_file: Optional[bytes],
-    verbose: Union[bool, int, float],
+    template_file: None | bytes,
+    verbose: bool | int | float,
 ) -> None:
     make_working_dir(dest_dir)
     os.chdir(dest_dir)
@@ -428,9 +425,9 @@ def make_all_length_objects(
     file_type: str,
     count: int,
     self_content: bool,
-    target: Optional[bytes],
+    target: None | bytes,
     all_bytes: bool,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
 ) -> None:
     make_working_dir(dest_dir)
     with chdir(
@@ -488,7 +485,7 @@ def check_file_count(
     dest_dir: bytes,
     count: int,
     file_type: str,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
 ):
     if not os.path.isdir(dest_dir):
         print("dest_dir:", dest_dir, "is not a dir")
@@ -503,7 +500,7 @@ def check_file_count(
 def main(
     root_dir,
     long_tests: bool,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
 ):
     # 1 byte names
     # expected file count = 255 - 2 = 253 (. and / note 0 is NULL)
@@ -807,9 +804,9 @@ def cli(
     long_tests: bool,
     one_angry_file: bool,
     template_file: str,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
     verbose_inf: bool,
-    dict_input: bool,
+    dict_output: bool,
 ):
 
     tty, verbose = tv(
@@ -897,5 +894,9 @@ def cli(
             verbose=verbose,
         ):
             output(
-                path.path, reason=path, tty=tty, dict_input=dict_input, verbose=verbose
+                path.path,
+                reason=path,
+                tty=tty,
+                dict_output=dict_output,
+                verbose=verbose,
             )
