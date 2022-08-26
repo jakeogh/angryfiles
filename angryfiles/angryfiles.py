@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# flake8: noqa
+# pylint: disable=useless-suppression             # [I0021]
 # pylint: disable=missing-docstring               # [C0111] docstrings are always outdated and wrong
 # pylint: disable=fixme                           # [W0511] todo is encouraged
 # pylint: disable=line-too-long                   # [C0301]
@@ -25,27 +25,23 @@ import pprint
 import random
 import struct
 import subprocess
-import sys
 import time
 from collections import defaultdict
-from collections.abc import Sequence
 from pathlib import Path
 from shutil import copy
 from tempfile import TemporaryDirectory
-from typing import ByteString
-from typing import Generator
-from typing import Iterable
-from typing import Set
 
 import click
-from asserttool import ic
 from clicktool import click_add_options
 from clicktool import click_global_options
 from clicktool import tv
-from eprint import eprint
 from getdents import paths
 from mptool import output
 from with_chdir import chdir
+
+# from collections.abc import Sequence
+# from eprint import eprint
+# from asserttool import ic
 
 global TOTALS_DICT
 TOTALS_DICT = defaultdict(int)
@@ -114,7 +110,7 @@ def write_file(
 
 
 # prob should be Set[bytes]
-def valid_filename_bytes() -> Set[list[bytes]]:
+def valid_filename_bytes() -> set[bytes]:
     """
     valid bytes to include in a filename
 
@@ -126,7 +122,6 @@ def valid_filename_bytes() -> Set[list[bytes]]:
     """
     # old_method = set([bytes(chr(x), encoding='Latin-1') for x in range(0, 256)]) - set([b'\x00', b'\x2F'])
     ans = set([bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))])
-    # ans = {[bytes([b]) for b in list(itertools.chain(range(1, 47), range(48, 256)))]}  # TypeError: unhashable type: 'list'
     another_method = set(
         [bytes([x]) for x in range(0, 256) if x not in (0, 0x2F)]
     )  # python@altendky
@@ -361,7 +356,7 @@ def make_all_two_byte_objects(
     dest_dir: bytes,
     file_type: str,
     count: int,
-    target: bytes,
+    target: None | bytes,
     verbose: bool | int | float,
 ) -> None:
     make_working_dir(dest_dir)
@@ -784,7 +779,7 @@ def one_mad_file(root_dir, template_file, verbose):
 @click.command()
 @click.argument(
     "output_dir", type=click.Path(exists=False, path_type=str, allow_dash=True), nargs=1
-)
+)  # todo recursive bug...
 @click.option("--stdout", is_flag=True)
 @click.option("--long-tests", is_flag=True)
 @click.option("--one-angry-file", is_flag=True)
@@ -830,7 +825,7 @@ def cli(
         )  # hmmm. ~ is a valid path name Bug.
 
     if root_dir.exists():
-        raise ValueError("output_dir: {} already exists".format(root_dir))
+        raise ValueError(f"output_dir: {root_dir} already exists")
     root_dir.mkdir()
 
     os.chdir(root_dir)
