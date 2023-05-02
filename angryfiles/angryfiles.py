@@ -275,7 +275,6 @@ def create_object(
     return
 
 
-# makes 2410 files
 def make_times_around_epoch_to_32bit_limit(
     root_dir: bytes,
     dest_dir: bytes,
@@ -762,7 +761,7 @@ def main(
         root_dir=root_dir,
         dest_dir=b"files/32bit_limit_times",
         file_type="file",
-        count=2410,
+        count=127,
         target=None,
     )
 
