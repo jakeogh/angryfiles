@@ -275,6 +275,63 @@ def create_object(
     return
 
 
+def make_times_around_epoch_to_32bit_limit(
+    root_dir: bytes,
+    dest_dir: bytes,
+    file_type: str,
+    target: None | bytes,
+    verbose: bool | int | float = False,
+):
+    def _write_object(
+        *,
+        atime_ns: int,
+        mtime_ns: int,
+        file_type: str,
+    ):
+        _name = f"atime_ns:{_atime_ns}__mtime_ns:{_mtime_ns}"
+        _destination = (
+            Path(os.fsdecode(root_dir)) / Path(os.fsdecode(dest_dir)) / Path(_name)
+        )
+        create_object(
+            name=os.fsencode(_destination),
+            file_type=file_type,
+            content=None,
+            target=None,
+            atime_ns=atime_ns,
+            mtime_ns=mtime_ns,
+        )
+
+    _ns = 0
+    _last_32bit_nanosecond = (2**31 - 1) * 10**9
+    while True:
+        ic(_ns)
+        _atime_ns = _mtime_ns = _ns
+        _write_object(file_type=file_type, atime_ns=_atime_ns, mtime_ns=_mtime_ns)
+        if _ns != 0:
+            _write_object(file_type=file_type, atime_ns=-_atime_ns, mtime_ns=-_mtime_ns)
+        if _ns == 0:
+            _ns += 1
+        else:
+            _ns = _ns * 2
+
+        # last "32bit" nanosecond (note any fs that has ns resolution is not 32bit timestamps)
+        if _ns >= _last_32bit_nanosecond:
+            _ns = _last_32bit_nanosecond
+            _atime_ns = _mtime_ns = _ns
+            _write_object(
+                file_type=file_type, atime_ns=_atime_ns - 1, mtime_ns=_mtime_ns - 1
+            )  # one nanosecond before 32bit limit
+            _write_object(
+                file_type=file_type,
+                atime_ns=-(_atime_ns - 1),
+                mtime_ns=-(_mtime_ns - 1),
+            )
+            _write_object(file_type=file_type, atime_ns=_atime_ns, mtime_ns=_mtime_ns)
+            _write_object(file_type=file_type, atime_ns=-_atime_ns, mtime_ns=-_mtime_ns)
+            break
+    return
+
+
 def make_all_one_byte_objects(
     *,
     root_dir: bytes,
@@ -678,6 +735,12 @@ def main(
         self_content=False,
         target=None,
         all_bytes=False,
+    )
+    make_times_around_epoch_to_32bit_limit(
+        root_dir=root_dir,
+        dest_dir=b"files/32bit_limit_times",
+        file_type="file",
+        target=None,
     )
 
     if long_tests:
