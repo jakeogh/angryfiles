@@ -282,6 +282,8 @@ def make_times_around_epoch_to_32bit_limit(
     target: None | bytes,
     verbose: bool | int | float = False,
 ):
+    make_working_dir(dest_dir)
+
     def _write_object(
         *,
         atime_ns: int,
