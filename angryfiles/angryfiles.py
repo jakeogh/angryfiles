@@ -293,12 +293,12 @@ def make_times_around_epoch_to_32bit_limit(
         if atime_ns >= 0:
             _name_a = f"atime_ns:+{atime_ns:019}"
         else:
-            _name_a = f"atime_ns:{atime_ns:019}"
+            _name_a = f"atime_ns:{atime_ns:020}"
 
         if mtime_ns >= 0:
             _name_m = f"mtime_ns:+{mtime_ns:019}"
         else:
-            _name_m = f"mtime_ns:{mtime_ns:019}"
+            _name_m = f"mtime_ns:{mtime_ns:020}"
 
         _name = f"{_name_a}__{_name_m}"
 
