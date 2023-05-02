@@ -290,7 +290,18 @@ def make_times_around_epoch_to_32bit_limit(
         mtime_ns: int,
         file_type: str,
     ):
-        _name = f"atime_ns:{atime_ns:019}__mtime_ns:{mtime_ns:019}"
+        if atime_ns >= 0:
+            _name_a = f"atime_ns:+{atime_ns:019}"
+        else:
+            _name_a = f"atime_ns:{atime_ns:019}"
+
+        if mtime_ns >= 0:
+            _name_m = f"mtime_ns:+{mtime_ns:019}"
+        else:
+            _name_m = f"mtime_ns:{mtime_ns:019}"
+
+        _name = f"{_name_a}__{_name_m}"
+
         _destination = (
             Path(os.fsdecode(root_dir)) / Path(os.fsdecode(dest_dir)) / Path(_name)
         )
