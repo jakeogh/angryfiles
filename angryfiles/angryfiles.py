@@ -193,7 +193,7 @@ def create_object(
     ]
 
     # assert content is None
-    # ic(name, file_type, content, target, template_file,)
+    ic(name, file_type, content, target, template_file, mtime_ns, atime_ns)
 
     assert file_type in valid_types
     if template_file:
