@@ -275,10 +275,12 @@ def create_object(
     return
 
 
+# makes 2410 files
 def make_times_around_epoch_to_32bit_limit(
     root_dir: bytes,
     dest_dir: bytes,
     file_type: str,
+    count: int,
     target: None | bytes,
     verbose: bool | int | float = False,
 ):
@@ -342,6 +344,13 @@ def make_times_around_epoch_to_32bit_limit(
             _write_object(file_type=file_type, atime_ns=_atime_ns, mtime_ns=_mtime_ns)
             _write_object(file_type=file_type, atime_ns=-_atime_ns, mtime_ns=-_mtime_ns)
             break
+
+    with chdir(root_dir):
+        check_file_count(
+            dest_dir=dest_dir,
+            count=count,
+            file_type=file_type,
+        )
     return
 
 
@@ -753,6 +762,7 @@ def main(
         root_dir=root_dir,
         dest_dir=b"files/32bit_limit_times",
         file_type="file",
+        count=2410,
         target=None,
     )
 
