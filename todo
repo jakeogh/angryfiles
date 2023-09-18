@@ -1,0 +1,329 @@
+zfs reservers .zfs/ for snapshots etc. so... need to make all 4 char file names:)
+
+https://github.com/openzfs/zfs/issues/13980
+
+all paris of of complementary chars () {} [] <> /\ +- -+ "" '' `` (and all of these quoted)
+
+all 1 pixel images
+
+byte strings that are not valid file names
+
+add unique key to each file content in tree to make app prove it read each path
+
+getconf ARG_MAX
+
+angry file name oracle
+
+angryos
+    every file name is obfusciated
+        makes file names and the os orthoginal
+
+accept a root_dir to iterate through in any order, using those files as template= args for every time angryfiles needs a template file
+
+'un-tab completable files"
+'In honor of @Acosta getting embarrassed on live television, not to mention how disrespectful he is, I want everybody to see this unearthed video of him doing #Arsenio back in the day! ‬Totally u...-9cfsjdg2zyw11.mp4'
+fuck, even that is a (copy/paste) bug, the real file name is:
+b'/home/cfg/_myapps/angryfiles/\xe2\x80\xaaIn honor of @Acosta getting embarrassed on live television, not to mention how disrespectful he is, I want everybody to see this unearthed video of him doing #Arsenio back in the day! \xe2\x80\xac \xe2\x80\xaaTotally u...-9cfsjdg2zyw11.mp4'
+
+
+"bloom" mode, each byte folder, nested, nested, nested ...
+    for zfstester
+    same idea, but with sequential numbering of folders
+
+
+every unicode .dotfile
+
+executable version of every single file, execution prints the contents or the hash
+    quines
+
+files named like args -- -0 -h --help
+
+write inode # to each file
+
+DT_UNKNOWN https://github.com/ziglang/zig/issues/5123
+
+all variation of perms bits, including +i and xattr
+
+valid binaries (/bin/true) with invalid unicode names
+
+all valid file names counting up in binary
+
+dirs with every # of files up to max argc (minimal_cee testing for args overflows after 255)
+
+all files in their msgpacked name
+    file names that are indistuningishable from properly messagepacked data
+        possible to construct a valid dir what's also valid msgpack when concatinated?
+            ditto for \0 joined names, and \n too
+
+all files with the contents being the sha3 of the N byte file name
+
+angryfiles for every type of dent. refactor to just deal with dent types, should be able to test some arb program with files names of every dent type, and every byte name(s)
+
+a deliberate FS BLACK HOLE.. no iterating out of it, it always goes deeper
+
+/dev/byte/0-255 that can be symlinked to
+
+symlink_to_bell -> /dev/bell (cat /dev/bell -> BELL)
+
+
+
+file names that draw ascii color pictures when written to the terminal
+
+stuff that breaks recursion depth maxes on different programming language implementations
+
+add max_depth, min_depth, min/max everything, file size, inode#, path element length, least perms, most perms
+
+all other encodings of each of the bytes and unicode's
+
+all unicode points with unicodehaz
+
++i and other attributes, bad permissions no +x on dirs etc
+
+malicious file names from mitre CVE's
+
+folders for deduplication tests, where a/ and b/ have >1 elements each and b has one or more duplicates of files in a, where not all files in a are in b
+
+FUSE files that do funky things... like have the max file size for different old FS's, or have max/min dates for all dates, or minimal or maximal perms, or change in size when read
+
+paths that are unicode, and then the same path, but in int codepoints
+
+files that look like escaped bytes \x5d
+
+files that are all beeps
+
+files with dangerious names "rm -rf ."
+
+file one
+file\n two
+(# [[ $'\0' == '' ]] && echo meow) # bash cant parse NULL
+
+files that look like results from "file": PAR.txt: Par archive data
+
+files that start and end with 'A' '''A''' "A" """A""" ""A""
+
+files named --help/-help/-h (make a option to gather these from a comand)
+
+names with unclosed quotes ' " ` and paren ( [ { and !'s
+
+all whitespace paths
+
+huge selection of url's all unrolled into the filesystem path
+
+lots of home/~/home/user~~/~/../~./.~/'"`s
+
+byte strings that match surrogate encoded paths
+
+max nested /~/~/~/~/ for every single byte file name
+
+every length file starting with ~
+
+various lath looking things with files literally named "~"
+bup fs to demonstrate why getdents64 kills find
+
+big example hash tree filesystems.
+
+files named "None" and "NOTHING" (etc) Zero NULL Nul NUL NaN nan bla bla
+
+files names the uescaped names of the bytes: f = Path(os.fsdecode(bytes([254])))
+
+nice help with cmdline examples ready to use to break stuff
+
+write those unicode test files
+
+unicode emoji's
+
+term color escape codes
+
+bytes root's to start with to attempt to feed kcl dirops iterate a bytes root from command line
+
+http://sourceware-org.1504.n7.nabble.com/BZ-6895-Describe-DT-LNK-td5495.html
+
+
+ $ ls /mnt/t420s_256GB_samsung_ssd_S2R5NX0J707260P/.iridb/database.local/iri_index/e/1/3/e132bae070e951b89305b6a943e94b0d82be4a8c/tags
+total 8.0K
+drwxr-xr-x 2 user user 4.0K May 19 12:05 .
+drwxr-xr-x 4 user user 4.0K May 19 12:05 ..
+lrwxrwxrwx 1 root root   40 May 19 12:05 9a3e67212ba7d06bafdc8c75df84684a2ab26a68 -> 9a3e67212ba7d06bafdc8c75df84684a2ab26a68
+
+
+all hash filenames for every combination ob bytes output, so sha1, sha256, sha3 for all combination sof 1 byte, and 2byte etc
+
+attrs
+xattrs (treat like files, run through same tests)
+
+
+symlinks to char device
+symlinks to block device
+block and char devices with bytes names
+
+filenames that look like the output of ls (symlinks -> etc) and other command line apps
+
+data classes, to test things like "file" with valid data
+
+broken symlinks where the target folder exists but the file does not (so readlink -f happily resolves it anyway)
+
+relative symlinks with and without path compoinents
+
+all length newline filenames and dirnames (for both kinds of newline)
+
+all shaX prefixes (iterate /dev/urnadom to get N files per folder where N is the nesting level)
+
+maximal length paths
+
+maximal depth trees
+
+base128/192
+
+all whitesapce filenames of every length
+
+unicode snowman
+
+iri's and uri's with testcases as filenames
+
+ln -P
+
+symlink->hardlink->file
+
+symlinks to different mountpoint (like the iridb abspath vs realpath problem) (and the non-shortest link dest example)
+
+files with all n byte combinations
+
+
+files of different sizes, all 1-1k, then 1k-1M in 1k inc etc..
+
+add command line option to skip all the asserts for speed
+
+all 1 byte symlinks to all 1 byte dirs
+all 1 byte symlinks to -> all 1 byte symlinks to all 1 byte dirs
+
+maximally nested symlink tree byte->byte->byte->byte
+
+maximally nested dir tree (to max out path length)
+randomly generated tree
+
+1 byte symlink to symlink to file
+
+[b-a] to see if glob.glob() is being used without glob.escape()
+
+
+2015-11-20_03:21:58 root@xeonbox0 ~/cfg/_myapps $ ls _badyt_copy
+total 222M
+drwxr-xr-x  2 user user 4.0K Nov  5 07:29 .
+drwxrwxr-x 40 user user 128K Nov 17 02:44 ..
+-rw-r--r--  1 user user 1.7K Nov  5 06:26 StormCloudsGathering__StormCloudsGathering__20130911__9_11 - Echoes of Darkness [Mini-documentary]__youtube__5PY_qM28rnA.description
+-rw-------  1 user user  28K Nov  5 06:26 StormCloudsGathering__StormCloudsGathering__20130911__9_11 - Echoes of Darkness [Mini-documentary]__youtube__5PY_qM28rnA.info.json
+-rw-r--r--  1 user user  12K Nov  5 06:26 StormCloudsGathering__StormCloudsGathering__NA__9_11 - Echoes of Darkness [Mini-documentary]__youtube__5PY_qM28rnA.info.json
+-rw-r--r--  1 user user 222M Nov  5 06:26 StormCloudsGathering__StormCloudsGathering__NA__9_11 - Echoes of Darkness [Mini-documentary]__youtube__5PY_qM28rnA.mp4
+-rw-r--r--  1 user user 1.7K Nov  5 06:26 StormCloudsGathering__StormCloudsGathering__NA__9_11 - Echoes of Darkness [Mini-documentary]__youtube__5PY_qM28rnA.mp4.description
+
+
+
+
+
+
+2015-12-11_20:54:53 root@xeonbox0 /home/user/cfg/input $ ll
+total 24
+drwxr-xr-x   5 user user 4096 Dec  9 20:30 .
+drwxrwxr-x 105 user user 4096 Dec  9 19:38 ..
+drwxr-xr-x   2 user user 4096 Dec 11 04:30 alphagrip
+drwxrwxr-x   4 user user 4096 Dec  9 22:15 keyboard
+drwxr-xr-x   2 user user 4096 Dec 10 23:47 mouse
+-rwxr-xr-x   1 user user   25 Dec  9 20:08 xinput_list
+2015-12-11_20:54:55 root@xeonbox0 /home/user/cfg/input $ ln -s ../linux/eudev/ udev
+2015-12-11_20:56:54 root@xeonbox0 /home/user/cfg/input $ ll
+total 24
+drwxr-xr-x   5 user user 4096 Dec 11 20:56 .
+drwxrwxr-x 105 user user 4096 Dec  9 19:38 ..
+drwxr-xr-x   2 user user 4096 Dec 11 04:30 alphagrip
+drwxrwxr-x   4 user user 4096 Dec  9 22:15 keyboard
+drwxr-xr-x   2 user user 4096 Dec 10 23:47 mouse
+lrwxrwxrwx   1 root root   15 Dec 11 20:56 udev -> ../linux/eudev/
+-rwxr-xr-x   1 user user   25 Dec  9 20:08 xinput_list
+2015-12-11_20:56:56 root@xeonbox0 /home/user/cfg/input $ rm udev/
+rm: cannot remove ‘udev/’: Is a directory
+2015-12-11_20:57:20 root@xeonbox0 /home/user/cfg/input $ rm udev
+rm: remove symbolic link ‘udev’? y
+2015-12-11_20:57:29 root@xeonbox0 /home/user/cfg/input $ ln -s ../linux/eudev udev
+2015-12-11_20:57:35 root@xeonbox0 /home/user/cfg/input $ ll
+total 24
+drwxr-xr-x   5 user user 4096 Dec 11 20:57 .
+drwxrwxr-x 105 user user 4096 Dec  9 19:38 ..
+drwxr-xr-x   2 user user 4096 Dec 11 04:30 alphagrip
+drwxrwxr-x   4 user user 4096 Dec  9 22:15 keyboard
+drwxr-xr-x   2 user user 4096 Dec 10 23:47 mouse
+lrwxrwxrwx   1 root root   14 Dec 11 20:57 udev -> ../linux/eudev
+-rwxr-xr-x   1 user user   25 Dec  9 20:08 xinput_list
+2015-12-11_20:57:36 root@xeonbox0 /home/user/cfg/input $
+
+ # TODO
+    # folders with #'s of files in them 2**0, 2**1, 2**2, files/dirs etc
+
+    Windows-1252
+        http://www.i18nqa.com/debug/utf8-debug.html
+
+    make fifos that look like files that when opened feed ugly data (attach to other fuzzers)
+    pure unicode filenames
+    control char file names (terminal color codes etc)
+
+    fifos plugged into /dev/zero
+    fifos plugged into /dev/null
+    symlinks to fifos
+    symlinks to block devices
+    symlinks to char devices
+    device nodes
+    every major,minor device
+    files with weird attributes
+    1 byte files
+    2 byte files
+    symlinks to /
+    files with odd mtimes and atimes
+    files that start with - and --
+    files that are all unprintable chars
+    files named exit/quit/exit()/quit()
+    crazy multiline unicode, odd unicode space mix
+    self ref symlinks
+    self ref links
+    all lengths of null
+    hard links
+    files that disapperar when you access them (inotify triggers)
+    files containing unicode, ascii, binary
+    network sockets
+    deeply nested trees, select a level for example 3 == 0/0/0 if it's indexed by hash filenames
+    expanmd to benchmarking, be able to test what's fastest to copy/count in a dir tree nesting level n=3, n=4, n=5 for hash index
+    hardlink for dir's (ln -F)
+    hardlink to symlink (ln -P)
+    device files
+    make a generator that does not write files, it just outputs the filenames for use with other stuff that should accept arb byte2
+    make files for every magic "file" byte signature to "fool" the "file" command
+    max depth dir tree
+    ext2/ext3/ext4 filesystem limits
+    symlink -> symlink -> symlink ... -> [file,dir.broken_symlink,fifo,device,socket] for "get_symlink_level(n)" testing
+    broken symlinks to bytes destinations
+    bytes broken symlinks to unicode destinations
+    bytes broken symlinks to invalid unicode destinations
+    bytes broken symlinks to bytes destinations
+
+    simple tests:
+        single folder
+            empty single char folder
+            single char folder
+                empty file
+            single char folder
+                2x empty files
+
+all byte folders nested in byte order
+
+files with weird flags/dates/metadata/perms
+symlinks back to /
+
+import keyword
+keyword.kwlist
+
+all file sizes up to x
+files guranteed to take up more than one block
+all attributes
+
+all numeric file names
+all caps file names
+all lowercase file names
+all symbol file names
