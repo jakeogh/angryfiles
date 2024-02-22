@@ -1,3 +1,15 @@
+executables like /bin/true for every file name
+
+https://github.com/ziglang/zig/issues/4812
+
+infinite bell nestings
+
+folder with symlink to every single object created by angryfiles
+
+every single --option and -o as every type of fs object
+
+max length /../something/../something/../
+
 zfs reservers .zfs/ for snapshots etc. so... need to make all 4 char file names:)
 
 https://github.com/openzfs/zfs/issues/13980
